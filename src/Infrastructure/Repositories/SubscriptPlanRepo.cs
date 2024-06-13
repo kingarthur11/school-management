@@ -2,6 +2,8 @@ using Core.Entities;
 using Core.Interfaces.Repositories;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Shared.Models.Responses;
+using static Shared.Constants.StringConstants;
 
 namespace Infrastructure.Repositories
 {
@@ -20,26 +22,63 @@ namespace Infrastructure.Repositories
         {
             return await _dbContext.SubscriptPlans.ToListAsync();
         }
-        public async Task<SubscriptPlan> AddSubscriptPlan(SubscriptPlan request)
+
+        public async Task<BaseResponse> AddAsync(Trip trip)
         {
-            var result = await _dbContext.SubscriptPlans.AddAsync(request);
-            await _dbContext.SaveChangesAsync();
-            SubscriptPlanBenefit planbenefit = new();
-            if (request.SubscriptPlanBenefits == null)
+            var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
+
+            _dbContext.Trips.Add(trip);
+
+            var result = await _dbContext.TrySaveChangesAsync();
+            if (result)
             {
-                var subscriptBenefits = request.SubscriptPlanBenefits;
-                foreach (var subscriptBenefit in subscriptBenefits)
-                {
-                    planbenefit.SubscriptBenefitsId = subscriptBenefit.Id;
-                    planbenefit.SubscriptPlanId = request.Id;
-                    planbenefit.SubscriptPlan = request;
-                    planbenefit.SubscriptBenefits = _dbContext.SubscriptBenefits.Where(plan => plan.Id == subscriptBenefit.Id).FirstOrDefault();
-                    _dbContext.SubscriptPlanBenefits.AddAsync(planbenefit);
-                    _dbContext.SaveChangesAsync();
-                }
+                return response;
             }
-            return result.Entity;
+
+            response.Message = "Unable to create new trip! Please try again";
+            response.Status = false;
+            response.Code = ResponseCodes.Status500InternalServerError;
+
+            return response;
         }
+        public async Task<BaseResponse> AddSubscriptPlan(SubscriptPlan request)
+        {
+            var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
+
+            await _dbContext.SubscriptPlans.AddAsync(request);
+
+            var result = await _dbContext.TrySaveChangesAsync();
+            if (result)
+            {
+                return response;
+            }
+
+            response.Message = "Unable to add student to the trip! Please try again";
+            response.Status = false;
+            response.Code = ResponseCodes.Status500InternalServerError;
+
+            return response;
+        }
+        // public async Task<SubscriptPlan> AddSubscriptPlan(SubscriptPlan request)
+        // {
+        //     var result = await _dbContext.SubscriptPlans.AddAsync(request);
+        //     await _dbContext.SaveChangesAsync();
+        //     SubscriptPlanBenefit planbenefit = new();
+        //     if (request.SubscriptPlanBenefits == null)
+        //     {
+        //         var subscriptBenefits = request.SubscriptPlanBenefits;
+        //         foreach (var subscriptBenefit in subscriptBenefits)
+        //         {
+        //             planbenefit.SubscriptBenefitsId = subscriptBenefit.Id;
+        //             planbenefit.SubscriptPlanId = request.Id;
+        //             planbenefit.SubscriptPlan = request;
+        //             planbenefit.SubscriptBenefits = _dbContext.SubscriptBenefits.Where(plan => plan.Id == subscriptBenefit.Id).FirstOrDefault();
+        //             _dbContext.SubscriptPlanBenefits.AddAsync(planbenefit);
+        //             _dbContext.SaveChangesAsync();
+        //         }
+        //     }
+        //     return result.Entity;
+        // }
         // public async Task<SubscriptPlan> UpdateSubscriptPlan(SubscriptPlan request, List<int> subscriptBenefitIds)
         // {
         //     var result = await _dataContex.SubscriptPlans.FirstOrDefaultAsync(sub => sub.Id == request.Id);

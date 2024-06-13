@@ -5,6 +5,9 @@ using Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shared.Models.Responses;
+using UserService.Models.RequestBody;
+using static Shared.Constants.StringConstants;
 
 namespace Core.Interfaces.Repositories
 {
@@ -28,38 +31,55 @@ namespace Core.Interfaces.Repositories
         //     var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == userEmail);
         //     return await _dbContext.UserSubscripts.FirstOrDefaultAsync(subscription => subscription.UserId == user.Id);
         // }
+
+        public async Task<BaseResponse> AddAsync(Trip trip)
+        {
+            var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
+
+            _dbContext.Trips.Add(trip);
+
+            var result = await _dbContext.TrySaveChangesAsync();
+            if (result)
+            {
+                return response;
+            }
+
+            response.Message = "Unable to create new trip! Please try again";
+            response.Status = false;
+            response.Code = ResponseCodes.Status500InternalServerError;
+
+            return response;
+        }
         public async Task<IEnumerable<UserSubscript>> GetAllUserSubscriptsAsync()
         {
             return await _dbContext.UserSubscripts.ToListAsync();
         }
         // // public async Task<UserSubscript> AddUserSubscript(SubscribeRequest request)
-        // public async Task<UserSubscript> AddUserSubscript(SubscribeRequest request)
-        // {
-        //     var subPlan = await _dataContex.SubscriptPlans.FirstOrDefaultAsync(sub => sub.Id == request.SubscriptPlanId);
-        //     // if (subPlan == null)
-        //     // {
-        //     //     return null;
-        //     // }
-        //     var userEmail =  _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier); 
-        //     var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == userEmail);
-        //     // return request.SubscriptPlanId;
-        //     if (user == null)
-        //     {
-        //         return null;
-        //     }
-        //     UserSubscript plan = new();
-        //     if (plan == null)
-        //     {
-        //         plan.SubscriptPlanId = request.SubscriptPlanId;
-        //         plan.UserId = user.Id;
-        //         plan.SubscriptPlan = subPlan;
-        //         plan.User = user;
-        //         var result = _dataContex.UserSubscripts.AddAsync(plan);
-        //         _dataContex.SaveChangesAsync();
-                
-        //     }
-        //     return plan;
-        // }
+        public async Task<BaseResponse> AddUserSubscript(SubscribeRequest request)
+        {
+            var subPlan = await _dbContext.SubscriptPlans.FirstOrDefaultAsync(sub => sub.Id == request.SubscriptPlanId);
+            var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
+
+            UserSubscript plan = new();
+            if (plan == null)
+            {
+                plan.SubscriptPlanId = request.SubscriptPlanId;
+                plan.PersonaId = Guid.NewGuid();
+                plan.SubscriptPlan = subPlan;
+            }
+            await _dbContext.UserSubscripts.AddAsync(plan);
+            var result = await _dbContext.TrySaveChangesAsync();
+            if (result)
+            {
+                return response;
+            }
+
+            response.Message = "Unable to add student to the trip! Please try again";
+            response.Status = false;
+            response.Code = ResponseCodes.Status500InternalServerError;
+
+            return response;
+        }
         
         // public async Task<UserSubscript> AddUserSubscript(SubscribeRequest request)
         // {
