@@ -34,22 +34,24 @@ To get started with this project, follow these steps:
    npm run server
    ```
 
+
 The application should now be running on http://localhost:9000.
-
-## Client Folder
-
-The `client` folder contains our Next.js application. We use **Shadcn UI** as our component library to build the UI efficiently and with a consistent style.
-
 
 
 Set up environment variables:
+
 Create a .env file in the root directory with the following variables:
+
 port=9000
 
 ## Dependencies
+
 Express.js
+
 MongoDB (using mongoose)
+
 dotenv (for environment variables)
+
 Jest and Supertest (for testing)
 
 ## Testing
