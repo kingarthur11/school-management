@@ -22,14 +22,17 @@ To get started with this project, follow these steps:
    ```bash
    cd prototype.service
    ```
-
 3. Install the dependencies:
 
    ```bash
    npm install
    ```
+4. Navigate to the client folder:
 
-4. Start the development server:
+   ```bash
+   cd src
+   ```
+5. Start the development server:
    ```bash
    npm run server
    ```
