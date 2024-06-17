@@ -54,6 +54,10 @@ dotenv (for environment variables)
 
 Jest and Supertest (for testing)
 
+## Project Structure
+
+Here's an overview of the folder structure within `service`:
+
 - `src/`: This is the main source directory where the core application code resides.
 
 - `controller/`: Receive incoming HTTP requests, extract relevant data (e.g., parameters, request body), and invoke the corresponding use case from the domain layer. They are responsible for handling various HTTP status codes and formatting responses.
