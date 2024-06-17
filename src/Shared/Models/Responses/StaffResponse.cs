@@ -12,6 +12,9 @@ namespace Models.Responses
         public string FirstName { get; init; } = string.Empty;
         public string LastName { get; init; } = string.Empty;
         public string PhotoUrl { get; set; } = string.Empty;
-
+        public string MiddleName { get; set; }
+        public string PhoneNumber { get; set; }
+        public Guid? JobTitleId { get; set; }
+        public Guid? DepartmentId { get; set; }
     }
 }

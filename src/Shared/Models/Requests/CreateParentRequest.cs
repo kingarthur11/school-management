@@ -36,6 +36,7 @@ namespace Models.Requests
 
         [Required]
         public IFormFile? Photo { get; set; }
+        public string MiddleName { get; set; }
     }
 
 }

@@ -57,7 +57,6 @@ namespace Core.Services
             return role;
         }
 
-
         public async Task<ApiResponse<ParentResponse>> CreateParentAsync(CreateParentRequest request, string host)
         {
             var response = new ApiResponse<ParentResponse>() { Code = ResponseCodes.Status201Created };
@@ -80,10 +79,21 @@ namespace Core.Services
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
-            _logger.LogInformation("Photo uploaded sucessfuly");
+            _logger.LogInformation("Photo uploaded successfully");
 
-
-            var user = new Persona() { Id = Guid.NewGuid() ,UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Parent };
+            var user = new Persona()
+            {
+                Id = Guid.NewGuid(),
+                UserName = request.Email,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                FirstName = request.FirstName,
+                MiddleName = request.MiddleName, // Adding MiddleName here
+                LastName = request.LastName,
+                EmailConfirmed = true,
+                PhotoUrl = photoUrl,
+                PesonaType = PersonaType.Parent
+            };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
@@ -98,6 +108,7 @@ namespace Core.Services
             {
                 Id = Guid.NewGuid(),
                 FirstName = request.FirstName,
+                MiddleName = request.MiddleName, // Adding MiddleName here
                 LastName = request.LastName,
                 PhotoUrl = photoUrl,
                 PersonaId = user.Id,
@@ -107,35 +118,49 @@ namespace Core.Services
             await _dbContext.Parents.AddAsync(parent);
             if (!await _dbContext.TrySaveChangesAsync())
             {
-                _logger.LogInformation("Unable create Parent entity.");
+                _logger.LogInformation("Unable to create Parent entity.");
                 response.Status = false;
-                response.Message = "Unable create Parent entity.";
+                response.Message = "Unable to create Parent entity.";
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
             _logger.LogInformation("Parent Creation is successful");
 
-
             var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.PARENT);
             if (!roleResult.Succeeded)
             {
-                _logger.LogInformation("Unable add user to Parent role.");
+                _logger.LogInformation("Unable to add user to Parent role.");
                 response.Status = false;
-                response.Message = "Unable add user to Parent role.";
+                response.Message = "Unable to add user to Parent role.";
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
 
-            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber};
+            var personaResponse = new PersonaResponse()
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName, // Adding MiddleName here
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber
+            };
             _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
 
-            //if (roleResult.Succeeded)
-            //{
-            //    await _auditTrailService.AddAsync(createTrail(AuditActions.Create, null, user.ToJson(), $"Created new user: {user.Email}"));
-            //}
-            response.Data = new ParentResponse() { PhotoUrl = user.PhotoUrl, Email = user.Email, FirstName = user.FirstName, ParentId = parent.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, UserName = user.UserName, Role = AuthConstants.Roles.PARENT };
+            response.Data = new ParentResponse()
+            {
+                PhotoUrl = user.PhotoUrl,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName, // Adding MiddleName here
+                ParentId = parent.Id,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                UserName = user.UserName,
+                Role = AuthConstants.Roles.PARENT
+            };
             return response;
         }
+
 
         public async Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor)
         {
@@ -151,6 +176,7 @@ namespace Core.Services
             }
 
             parent.FirstName = request.FirstName ?? parent.FirstName;
+            parent.MiddleName = request.MiddleName ?? parent.MiddleName; // Update MiddleName
             parent.LastName = request.LastName ?? parent.LastName;
             parent.Edit(editor);
 
@@ -170,10 +196,10 @@ namespace Core.Services
             else
             {
                 persona.FirstName = request.FirstName ?? persona.FirstName;
+                persona.MiddleName = request.MiddleName ?? persona.MiddleName; // Update MiddleName
                 persona.LastName = request.LastName ?? persona.LastName;
                 await _userManager.UpdateAsync(persona);
             }
-
 
             return response;
         }
@@ -197,7 +223,7 @@ namespace Core.Services
             {
                 response.Code = ResponseCodes.Status400BadRequest;
                 response.Status = false;
-                response.Message = "Invaild ParentId";
+                response.Message = "Invalid ParentId";
                 return response;
             }
 
@@ -212,7 +238,7 @@ namespace Core.Services
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
-            _logger.LogInformation("Photo uploaded sucessfuly");
+            _logger.LogInformation("Photo uploaded successfully");
 
             Persona user;
             string emailExist = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com");
@@ -220,12 +246,34 @@ namespace Core.Services
             int sameEmailCount = await _dbContext.Users.CountAsync(x => x.Email == emailExist);
             if (sameEmailCount is not 0)
             {
-                emailExist = string.Concat(request.FirstName, request.LastName,$"{sameEmailCount++}","@","smsabuja", ".com");
-                user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = emailExist, UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
+                emailExist = string.Concat(request.FirstName, request.LastName, $"{sameEmailCount++}", "@", "smsabuja", ".com");
+                user = new Persona()
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = request.FirstName,
+                    MiddleName = request.MiddleName, // Add MiddleName here
+                    LastName = request.LastName,
+                    Email = emailExist,
+                    UserName = string.Concat(request.FirstName, request.LastName),
+                    PhotoUrl = photoUrl,
+                    PesonaType = PersonaType.Student,
+                    EmailConfirmed = true
+                };
             }
             else
             {
-                user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"), UserName = string.Concat(request.FirstName,  request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
+                user = new Persona()
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = request.FirstName,
+                    MiddleName = request.MiddleName, // Add MiddleName here
+                    LastName = request.LastName,
+                    Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"),
+                    UserName = string.Concat(request.FirstName, request.LastName),
+                    PhotoUrl = photoUrl,
+                    PesonaType = PersonaType.Student,
+                    EmailConfirmed = true
+                };
             }
 
             var creationResult = await _userManager.CreateAsync(user, request.Password);
@@ -247,7 +295,7 @@ namespace Core.Services
                 {
                     response.Status = false;
                     response.Code = ResponseCodes.Status400BadRequest;
-                    response.Message = "Bus doesnt exist";
+                    response.Message = "Bus doesn't exist";
                     return response;
                 }
 
@@ -255,6 +303,7 @@ namespace Core.Services
                 {
                     Id = Guid.NewGuid(),
                     FirstName = request.FirstName,
+                    MiddleName = request.MiddleName, // Add MiddleName here
                     LastName = request.LastName,
                     PhotoUrl = photoUrl,
                     PersonaId = user.Id,
@@ -270,6 +319,7 @@ namespace Core.Services
                 {
                     Id = Guid.NewGuid(),
                     FirstName = request.FirstName,
+                    MiddleName = request.MiddleName, // Add MiddleName here
                     LastName = request.LastName,
                     PhotoUrl = photoUrl,
                     PersonaId = user.Id,
@@ -279,13 +329,12 @@ namespace Core.Services
                 };
             }
 
-
             await _dbContext.Students.AddAsync(student);
             if (!await _dbContext.TrySaveChangesAsync())
             {
-                _logger.LogInformation("Unable create Student entity.");
+                _logger.LogInformation("Unable to create Student entity.");
                 response.Status = false;
-                response.Message = "Unable create Students entity.";
+                response.Message = "Unable to create Students entity.";
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
@@ -303,27 +352,37 @@ namespace Core.Services
             var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STUDENT);
             if (!roleResult.Succeeded)
             {
-                _logger.LogInformation("Unable add user to Student role.");
+                _logger.LogInformation("Unable to add user to Student role.");
                 response.Status = false;
-                response.Message = "Unable add user to Student role.";
+                response.Message = "Unable to add user to Student role.";
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
 
-            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
+            var personaResponse = new PersonaResponse()
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName, // Add MiddleName here
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber
+            };
             _ = _mediator.Publish(new NewStudentCreatedEvent(personaResponse, request.Password, parent.FullName, parent.Email));
 
+            response.Data = new StudentResponse()
+            {
+                StudentId = student.Id,
+                PhotoUrl = user.PhotoUrl,
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName, // Add MiddleName here
+                BusServiceRequired = request.BusServiceRequired,
+                LastName = user.LastName,
+                Role = AuthConstants.Roles.STUDENT
+            };
 
-            response.Data = new StudentResponse() {StudentId = student.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
-
-            //if (roleResult.Succeeded)
-            //{
-            //    await _auditTrailService.AddAsync(createTrail(AuditActions.Create, null, user.ToJson(), $"Created new user: {user.Email}"));
-            //}
             return response;
         }
-       
-        
+
         public async Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor)
         {
             var response = new ApiResponse<StudentResponse>();
@@ -338,8 +397,9 @@ namespace Core.Services
             }
 
             student.FirstName = request.FirstName ?? student.FirstName;
-            student.LastName = request.LastName ??  student.LastName;
-            student.Edit(editor);          
+            student.MiddleName = request.MiddleName ?? student.MiddleName; // Update MiddleName
+            student.LastName = request.LastName ?? student.LastName;
+            student.Edit(editor);
 
             if (!(await _dbContext.TrySaveChangesAsync()))
             {
@@ -354,15 +414,38 @@ namespace Core.Services
             {
                 _logger.LogInformation("Student account not found. Update not completed");
             }
-            else 
+            else
             {
                 persona.FirstName = request.FirstName ?? persona.FirstName;
+                persona.MiddleName = request.MiddleName ?? persona.MiddleName; // Update MiddleName
                 persona.LastName = request.LastName ?? persona.LastName;
                 await _userManager.UpdateAsync(persona);
             }
-     
+
+            // Create a StudentResponse with updated information
+            response.Data = new StudentResponse
+            {
+                StudentId = student.Id,
+                PhotoUrl = student.PhotoUrl,
+                FirstName = student.FirstName,
+                MiddleName = student.MiddleName, // Include MiddleName in the response
+                LastName = student.LastName,
+                Role = AuthConstants.Roles.STUDENT
+            };
+
+            response.Status = true;
+            response.Code = ResponseCodes.Status200OK;
+            response.Message = "Student updated successfully";
+
             return response;
         }
+
+
+
+
+
+
+
 
 
         public async Task<BaseResponse> CreateBusDriverAsync(CreateBusDriverRequest request, string host)
@@ -411,7 +494,7 @@ namespace Core.Services
             _logger.LogInformation("Photo uploaded sucessfuly");
 
 
-            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl,  PesonaType = PersonaType.BusDriver };
+            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.BusDriver };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
@@ -462,6 +545,7 @@ namespace Core.Services
             return response;
         }
 
+
         public async Task<BaseResponse> CreateStaffAsync(CreateStaffRequest request, string host)
         {
             var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
@@ -486,10 +570,20 @@ namespace Core.Services
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
-            _logger.LogInformation("Photo uploaded sucessfuly");
+            _logger.LogInformation("Photo uploaded successfully");
 
-
-            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Staff };
+            var user = new Persona()
+            {
+                UserName = request.Email,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                FirstName = request.FirstName,
+                MiddleName = request.MiddleName, // Add MiddleName here
+                LastName = request.LastName,
+                EmailConfirmed = true,
+                PhotoUrl = photoUrl,
+                PesonaType = PersonaType.Staff
+            };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
@@ -504,6 +598,7 @@ namespace Core.Services
             {
                 Id = Guid.NewGuid(),
                 FirstName = request.FirstName,
+                MiddleName = request.MiddleName, // Add MiddleName here
                 LastName = request.LastName,
                 PhotoUrl = photoUrl,
                 PersonaId = user.Id,
@@ -513,9 +608,9 @@ namespace Core.Services
             await _dbContext.Staffs.AddAsync(staff);
             if (!await _dbContext.TrySaveChangesAsync())
             {
-                _logger.LogInformation("Unable create Bus driver entity.");
+                _logger.LogInformation("Unable to create Staff entity.");
                 response.Status = false;
-                response.Message = "Unable create Bus Driver entity.";
+                response.Message = "Unable to create Staff entity.";
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
@@ -524,19 +619,27 @@ namespace Core.Services
             var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STAFF);
             if (!roleResult.Succeeded)
             {
-                _logger.LogInformation("Unable add user to Staff role.");
-                response.Message = "Unable add user to Staff role.";
+                _logger.LogInformation("Unable to add user to Staff role.");
+                response.Message = "Unable to add user to Staff role.";
                 response.Code = ResponseCodes.Status500InternalServerError;
                 response.Status = false;
                 return response;
             }
 
-
-            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
+            var personaResponse = new PersonaResponse()
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName, // Add MiddleName here
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber
+            };
             _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
 
             return response;
         }
+
+
 
 
         public async Task<ApiResponse<List<ParentResponse>>> ParentListAsync()
@@ -552,10 +655,11 @@ namespace Core.Services
                     Email = x.Email,
                     PhoneNumber = x.PhoneNumber,
                     PhotoUrl = x.PhotoUrl,
+                    MiddleName = x.MiddleName, // Add MiddleName here
                 })
                 .AsNoTracking()
                 .ToListAsync();
-            
+
             foreach (var parent in parents)
             {
                 parent.NumberOfStudent = _dbContext.ParentStudent.Where(x => x.ParentsId == parent.ParentId).Count();
@@ -577,6 +681,7 @@ namespace Core.Services
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     PhotoUrl = x.PhotoUrl,
+                    MiddleName = x.MiddleName, // Add MiddleName here
                 })
                 .AsNoTracking();
 
@@ -620,6 +725,7 @@ namespace Core.Services
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     PhotoUrl = x.PhotoUrl,
+                    MiddleName = x.MiddleName, // Add MiddleName here
                 })
                 .AsNoTracking();
 
@@ -705,6 +811,7 @@ namespace Core.Services
                 FirstName = parent.FirstName,
                 LastName = parent.LastName,
                 PhotoUrl = parent.PhotoUrl ?? string.Empty,
+                MiddleName = parent.MiddleName, // Add MiddleName here
             };
 
             return response;
@@ -727,7 +834,7 @@ namespace Core.Services
             }
 
             student.Delete(deletor);
-            var studentParent = await _dbContext.ParentStudent.FirstOrDefaultAsync(x => x.StudentsId == studentId); 
+            var studentParent = await _dbContext.ParentStudent.FirstOrDefaultAsync(x => x.StudentsId == studentId);
             if (studentParent is null)
             {
                 _logger.LogInformation("parent-student entity doesnt exist");
@@ -784,9 +891,9 @@ namespace Core.Services
             var response = new ApiResponse<List<PersonaResponse>>();
 
             response.Data = await (from user in _dbContext.Users
-                                 join userRoles in _dbContext.UserRoles on user.Id equals userRoles.UserId
-                                 join role in _dbContext.Roles on userRoles.RoleId equals role.Id
-                                 select new PersonaResponse { Id = user.Id, UserName = user.UserName,FirstName = user.FirstName, LastName = user.LastName, Email = user.Email, Role = role.Name })
+                                   join userRoles in _dbContext.UserRoles on user.Id equals userRoles.UserId
+                                   join role in _dbContext.Roles on userRoles.RoleId equals role.Id
+                                   select new PersonaResponse { Id = user.Id, UserName = user.UserName, FirstName = user.FirstName, LastName = user.LastName, Email = user.Email, Role = role.Name })
                             .ToListAsync();
 
             return response;
@@ -841,7 +948,7 @@ namespace Core.Services
                         busDriver.Delete(persona.Email);
                         break;
                     }
-                   
+
                 case PersonaType.Staff:
                     {
                         var staff = await _dbContext.Staffs.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);

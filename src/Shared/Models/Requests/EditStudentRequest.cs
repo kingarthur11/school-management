@@ -11,7 +11,6 @@ namespace Models.Requests
         public Guid? GradeId { get; set; }
 
         public bool? BusServiceRequired { get; set; }
-
-       
+        public string MiddleName { get; set; }
     }
 }

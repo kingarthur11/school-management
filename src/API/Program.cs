@@ -53,7 +53,6 @@ try
            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
            .Enrich.FromLogContext()
            .WriteTo.Console()
-           //.WriteTo.File(outputTemplate:"", formatter: "Serilog.Formatting.Json.JsonFormatter, Serilog")
            .CreateLogger();
     }
     else if (builder.Environment.IsStaging())
@@ -71,7 +70,6 @@ try
                 shared: true,
                 retainedFileCountLimit: null,
                 flushToDiskInterval: TimeSpan.FromSeconds(1))
-           //.WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces)
            .CreateLogger();
     }
     else
@@ -89,16 +87,13 @@ try
                 shared: true,
                 retainedFileCountLimit: null,
                 flushToDiskInterval: TimeSpan.FromSeconds(1))
-           //.WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces)
            .CreateLogger();
     }
 
     builder.Host.UseSerilog();
     builder.Services.AddControllers();
 
-
-
-    //Register services
+    // Register services
     var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? string.Empty;
     builder.Services.AddDbContext<AppDbContext>(options =>
     {
@@ -122,8 +117,7 @@ try
     builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
     builder.Services.AddTransient<IEmailService, SmtpEmailSender>();
 
-
-    //Repositories
+    // Repositories
     builder.Services.AddTransient<IBusRepository, BusRepository>();
     builder.Services.AddTransient<ICampusRepository, CampusRepository>();
     builder.Services.AddTransient<IGradeRepository, GradeRepository>();
@@ -135,8 +129,7 @@ try
     builder.Services.AddTransient<IBusDriverRepository, BusDriverRepository>();
     builder.Services.AddTransient<IParentRepository, ParentRepository>();
 
-
-    //Services
+    // Services
     builder.Services.AddTransient<IAuthService, AuthService>();
     builder.Services.AddTransient<IPersonaService, PersonaService>();
     builder.Services.AddTransient<ITokenService, TokenService>();
@@ -153,10 +146,7 @@ try
     builder.Services.AddScoped<ISubscriptBenefitRepo, SubscriptBenefitRepo>();
     builder.Services.AddScoped<IUserSubscriptionRepo, UserSubscriptionRepo>();
 
-
-
     builder.Services.AddTransient<IOtpGenerator, OtpGenerator>();
-
 
     var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? DefaultValues.JWT_SECRET_KEY);
     var tokenValidationParams = new TokenValidationParameters
@@ -181,16 +171,17 @@ try
         config.TokenValidationParameters = tokenValidationParams;
     });
 
-    // builder.Services.AddAuthorization(options =>
-    // {
-    //     options.AddPolicy(AuthConstants.Policies.ADMINS, policy => policy.RequireRole(AuthConstants.Roles.ADMIN, AuthConstants.Roles.SUPER_ADMIN));
-    // });
+    // Register the authorization policies
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy(AuthConstants.Policies.ADMINS, policy =>
+            policy.RequireRole(AuthConstants.Roles.ADMIN, AuthConstants.Roles.SUPER_ADMIN));
+    });
 
     // Register the worker responsible of seeding the database.
     builder.Services.AddHostedService<SeedDb>();
 
-
-    //Ensure all controllers use jwt token
+    // Ensure all controllers use JWT token
     builder.Services.AddControllers(options =>
     {
         var policy = new AuthorizationPolicyBuilder()
@@ -199,8 +190,6 @@ try
             .Build();
         options.Filters.Add(new AuthorizeFilter(policy));
     });
-
- 
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(d =>
@@ -214,7 +203,6 @@ try
             {
                 Name = "Stella Maris Schools",
                 Email = "dev.nuhu@smsbuja.com",
-                //Url = new Uri("https://sms.ng")
             },
         });
 
@@ -227,12 +215,11 @@ try
             {
                 Name = "Stella Maris Schools",
                 Email = "dev.nuhu@smsbuja.com",
-                //Url = new Uri("https://sms.ng")
             },
         });
     });
 
-    //Swagger Authentication/Authorization
+    // Swagger Authentication/Authorization
     builder.Services.AddSwaggerGen(c =>
     {
         var securityScheme = new OpenApiSecurityScheme
@@ -258,7 +245,7 @@ try
         });
     });
 
-    //Add Cors
+    // Add Cors
     const string CORS_POLICY = "CorsPolicy";
     builder.Services.AddCors(options =>
     {
@@ -270,7 +257,6 @@ try
                                   "http://www.mystarsonline.com",
                                   "https://www.mystarsonline.com"
                               });
-                              //builder.AllowAnyOrigin();
                               builder.AllowAnyMethod();
                               builder.AllowAnyHeader();
                           });
@@ -287,13 +273,12 @@ try
                       ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
               });
 
-        //Persist key
+        // Persist key
         builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("/var/keys"));
     }
 
-    //Remove Server Header
+    // Remove Server Header
     builder.WebHost.UseKestrel(options => options.AddServerHeader = false);
-
 
     // Create the directory if it doesn't exist
     var path = Path.Combine(builder.Environment.ContentRootPath, "static");
@@ -302,29 +287,16 @@ try
         Directory.CreateDirectory(path);
     }
 
-
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
-
     if (!app.Environment.IsProduction())
     {
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
-            //c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
             c.SwaggerEndpoint($"/swagger/SPE Module/swagger.json", "SPE Module");
-
-            //const string swaggerRoutePrefix = "api-docs";
-            //c.RoutePrefix = swaggerRoutePrefix;
-            //foreach (var description in provider.ApiVersionDescriptions)
-            //{
-            //    c.SwaggerEndpoint(
-            //        $"/swagger/{description.GroupName}/swagger.json",
-            //        description.GroupName.ToUpperInvariant());
-            //}
         });
-
     }
 
     app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -333,8 +305,7 @@ try
     });
 
     app.UseAuthentication();
-
-    // app.UseAuthorization();
+    app.UseAuthorization();
 
     app.MapControllers();
 
@@ -354,7 +325,6 @@ finally
 {
     Log.CloseAndFlush();
 }
-
 
 public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 {

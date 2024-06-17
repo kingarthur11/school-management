@@ -62,15 +62,6 @@ namespace API.Controllers.SPE
                 return BadRequest(response);
             }
 
-            //var tenantExist = await _dbContext.Tenants.FirstOrDefaultAsync(x => x.TenantAdminEmail == request.Email);
-            //if (tenantExist is not null)
-            //{
-            //    response.Code = StatusCodes.Status400BadRequest;
-            //    response.Status = false;
-            //    response.Message = "Tenant already exist";
-            //    return BadRequest(response);
-            //}
-
             var tenant = new Tenant()
             {
                 Id = Guid.NewGuid(),
@@ -82,25 +73,33 @@ namespace API.Controllers.SPE
             var result = await _dbContext.TrySaveChangesAsync();
             if (result is false)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,new { message = "Unable to register school"});
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Unable to register school" });
             }
             _logger.LogInformation("Successfully created a new tenant with name: {0}", request.SchoolName);
 
-
             _logger.LogInformation("Creating a new tenant admin with tenant-name: {0} and admins name: {1}", request.SchoolName, request.Firstname + " " + request.Lastname);
-            var user = new Persona() {  Id = Guid.NewGuid(), UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.Firstname, LastName = request.Lastname, EmailConfirmed = true, PesonaType = PersonaType.Admin };
-            //var user = new Persona() { TenantKey = tenant.Id.ToString(), Id = Guid.NewGuid(), UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.Firstname, LastName = request.Lastname, EmailConfirmed = true, PesonaType = PersonaType.Admin };
+            var user = new Persona()
+            {
+                Id = Guid.NewGuid(),
+                UserName = request.Email,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                FirstName = request.Firstname,
+                LastName = request.Lastname,
+                MiddleName = request.MiddleName, // Add MiddleName property
+                EmailConfirmed = true,
+                PesonaType = PersonaType.Admin
+            };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
                 response.Code = StatusCodes.Status400BadRequest;
                 response.Status = false;
                 response.Message = string.Join(',', creationResult.Errors.Select(a => a.Description));
-                _logger.LogInformation("Unable to create tenant admin for tenant {0} with the following error {1}",request.SchoolName, response.Message);
+                _logger.LogInformation("Unable to create tenant admin for tenant {0} with the following error {1}", request.SchoolName, response.Message);
                 return BadRequest(response);
             }
             _logger.LogInformation("Tenant admin Creation is successful");
-
 
             var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.ADMIN);
             if (!roleResult.Succeeded)
@@ -112,11 +111,11 @@ namespace API.Controllers.SPE
                 return StatusCode(500, response);
             }
 
-
             response.Message = "Tenant School created successfully! You can login with your credentials";
             response.Status = true;
 
             return Ok(response);
         }
+
     }
 }

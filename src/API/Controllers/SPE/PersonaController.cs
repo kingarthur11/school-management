@@ -490,11 +490,11 @@ namespace API.Controllers.SPE
 
         [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
-           Summary = "Edit Staff Endpoint",
-           Description = "This endpoint edits an existing staff. It requires Admin privilege",
-           OperationId = "staff.edit",
-           Tags = new[] { "PersonaEndpoints" })
-       ]
+     Summary = "Edit Staff Endpoint",
+     Description = "This endpoint edits an existing staff. It requires Admin privilege",
+     OperationId = "staff.edit",
+     Tags = new[] { "PersonaEndpoints" })
+ ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ApiResponse<StaffResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -534,15 +534,23 @@ namespace API.Controllers.SPE
                 staff.PhoneNumber = request.PhoneNumber;
             }
 
-            //if (request.JobTitleId.HasValue)
-            //{
-            //    staff.JobTitleId = request.JobTitleId;
-            //}
+            // add check for middle name
+            if (!string.IsNullOrEmpty(request.MiddleName))
+            {
+                staff.MiddleName = request.MiddleName;
+                persona.MiddleName = request.MiddleName;
+            }
 
-            //if (request.DepartmentId.HasValue)
-            //{
-            //    staff.DepartmentId = request.DepartmentId;
-            //}
+            // Update JobTitleId and DepartmentId if they are provided
+            if (request.JobTitleId.HasValue)
+            {
+                staff.JobTitleId = request.JobTitleId;
+            }
+
+            if (request.DepartmentId.HasValue)
+            {
+                staff.DepartmentId = request.DepartmentId;
+            }
 
             _context.Staffs.Update(staff);
             _context.Users.Update(persona);
@@ -550,17 +558,19 @@ namespace API.Controllers.SPE
 
             var response = new StaffResponse
             {
-                StaffId = staff.PersonaId,
+                StaffId = staff.Id,
                 LastName = staff.LastName,
                 FirstName = staff.FirstName,
                 PhotoUrl = staff.PhotoUrl,
-                //PhoneNumber = staff.PhoneNumber,
-                //JobTitleId = staff.JobTitleId,
-                //DepartmentId = staff.DepartmentId
+                MiddleName = staff.MiddleName,
+                PhoneNumber = staff.PhoneNumber,
+                JobTitleId = staff.JobTitleId,
+                DepartmentId = staff.DepartmentId
             };
 
             return HandleResult(new ApiResponse<StaffResponse> { Data = response, Status = true });
         }
+
     }
 
 

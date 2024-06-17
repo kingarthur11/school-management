@@ -11,6 +11,7 @@
         public IList<string>? Roles { get; set; }
         public string? Role { get; set; }
         public string TenantKey { get; set; }
+        public string MiddleName { get; set; }
     }
 
 }

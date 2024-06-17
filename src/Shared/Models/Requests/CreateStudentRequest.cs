@@ -36,6 +36,7 @@ namespace Models.Requests
         [Required(ErrorMessage = "Please provide a value for the confirm password field"), Compare(nameof(Password), ErrorMessage = "Passwords do not match")]
         [StringLength(255)]
         public string ConfirmPassword { get; set; } = string.Empty;
+        public string MiddleName { get; set; }
     }
 
 }

@@ -7,6 +7,7 @@ namespace Infrastructure.Identity
         public string LastName { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string FullName { get => $"{FirstName} {LastName}"; }
+        public string? MiddleName { get; set; }
         public string? PhotoUrl { get; set; }
         public PersonaType PesonaType { get; set; }
         public bool IsActive { get; set; } = true;

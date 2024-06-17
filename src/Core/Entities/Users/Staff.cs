@@ -22,6 +22,7 @@ namespace Core.Entities.Users
         public JobTitle? JobTitle { get; set; }
         public Guid? DepartmentId { get; set; }
         public Department? Department { get; set; }
+        public string MiddleName { get; set; }
 
         public void Delete(string deletor)
         {

@@ -17,6 +17,7 @@ namespace Models.Responses
         public string UserName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public int NumberOfStudent { get; set; }
+        public string MiddleName { get; set; }
     }
 
 }

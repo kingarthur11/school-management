@@ -14,6 +14,7 @@ namespace Core.Entities.Users
         public string LastName { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string FullName { get => $"{FirstName} {LastName}"; }
+        public string MiddleName { get; set; }
         public string? PhotoUrl { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? Sex { get; set; }

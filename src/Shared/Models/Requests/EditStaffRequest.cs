@@ -17,7 +17,11 @@ namespace Shared.Models.Requests
         [StringLength(100)]
         public string FirstName { get; set; } = string.Empty;
 
+        public string MiddleName { get; set; }
+
 
         public string PhoneNumber { get; set; } = string.Empty;
+        public Guid? DepartmentId { get; set; }
+        public Guid? JobTitleId { get; set; }
     }
 }

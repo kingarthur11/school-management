@@ -15,6 +15,7 @@ namespace Models.Responses
         public string Grade { get; set; } = string.Empty;
         public bool? BusServiceRequired { get; set; }
         public string Role { get; set; } = string.Empty;
+        public string MiddleName { get; set; }
     }
 
 }

@@ -25,6 +25,9 @@ namespace Models.Requests
         [Required]
         public string LastName { get; init; } = string.Empty;
 
+        [Required]
+        public string MiddleName { get; init; } = string.Empty;
+
         [Required(ErrorMessage = "Please provide a value for password field"), MinLength(8, ErrorMessage = "Password must consist of at least 8 characters")]
         [StringLength(255)]
         public string Password { get; set; } = string.Empty;
