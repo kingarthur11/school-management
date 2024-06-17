@@ -54,34 +54,26 @@ dotenv (for environment variables)
 
 Jest and Supertest (for testing)
 
-1. src/
-This is the main source directory where the core application code resides.
+- `src/`: This is the main source directory where the core application code resides.
 
-2. controller/
-Receive incoming HTTP requests, extract relevant data (e.g., parameters, request body), and invoke the corresponding use case from the domain layer. They are responsible for handling various HTTP status codes and formatting responses.
+- `controller/`: Receive incoming HTTP requests, extract relevant data (e.g., parameters, request body), and invoke the corresponding use case from the domain layer. They are responsible for handling various HTTP status codes and formatting responses.
 
-3. domain/
-The domain layer encapsulates the core business logic and entities of your application. It defines what your application does and models the problem domain it addresses.
+- `domain/`: The domain layer encapsulates the core business logic and entities of your application. It defines what your application does and models the problem domain it addresses.
 
-4. routes/
-Define how different HTTP endpoints map to specific controllers or handlers. This typically involves using a routing framework like Express.js in Node.js applications.
+- `routes/`: Define how different HTTP endpoints map to specific controllers or handlers. This typically involves using a routing framework like Express.js in Node.js applications.
 
-5. server/
-Adapters bridge the gap between the application-specific use cases and the external frameworks, libraries, or services. This folder may contain implementations of repositories, controllers, presenters, or other adapters that interface with external systems such as databases, web frameworks (e.g., Express.js), external APIs, or any other infrastructure-related concerns.
+- `server/`: Adapters bridge the gap between the application-specific use cases and the external frameworks, libraries, or services. This folder may contain implementations of repositories, controllers, presenters, or other adapters that interface with external systems such as databases, web frameworks (e.g., Express.js), external APIs, or any other infrastructure-related concerns.
 
-6. util/
-This folder contains the external frameworks and tools used by the application. It may include configuration files, utility functions, middleware, or any other code that directly interacts with or configures external dependencies like databases, web servers, logging frameworks, etc.
+- `util/`: This folder contains the external frameworks and tools used by the application. It may include configuration files, utility functions, middleware, or any other code that directly interacts with or configures external dependencies like databases, web servers, logging frameworks, etc.
 
-7. server.js
-This file typically serves as the entry point of your application. It may bootstrap the application, configure dependency injection (if used), and start the server or application logic.
+- `server.js`: This file typically serves as the entry point of your application. It may bootstrap the application, configure dependency injection (if used), and start the server or application logic.
 
-8. tests/
-This directory contains test cases for your application. It's often organized into subdirectories such as unit/ for unit tests and integration/ for integration tests.
+- `tests/`: This directory contains test cases for your application. It's often organized into subdirectories such as unit/ for unit tests and integration/ for integration tests.
 
 Other Files
-.gitignore: Specifies files and directories that should be ignored by version control (e.g., node_modules, build artifacts).
-package.json: Manifest file for Node.js projects, specifying dependencies and scripts.
-README.md: Documentation file providing an overview of the project, its structure, and instructions for usage, installation, and more.
+- `.gitignore`: Specifies files and directories that should be ignored by version control (e.g., node_modules, build artifacts).
+- `package.json`: Manifest file for Node.js projects, specifying dependencies and scripts.
+- `README.md`: Documentation file providing an overview of the project, its structure, and instructions for usage, installation, and more.
 
 ## Testing
 To run tests, use the following command:
