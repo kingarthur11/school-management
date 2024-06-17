@@ -13,16 +13,16 @@ Before you begin, ensure you have the following installed:
 
 ### Installation
 
-To set up the project for development, follow these steps:
+To get started with this project, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/fourstrides/prototype.client.git
+   git clone https://github.com/fourstrides/prototype.service.git
    ```
 2. Navigate to the client folder:
 
    ```bash
-   cd prototype.client/client
+   cd prototype.service
    ```
 
 3. Install the dependencies:
@@ -33,34 +33,37 @@ To set up the project for development, follow these steps:
 
 4. Start the development server:
    ```bash
-   npm dev
+   npm run server
    ```
 
-The application should now be running on http://localhost:3000.
+The application should now be running on http://localhost:9000.
 
 ## Client Folder
 
 The `client` folder contains our Next.js application. We use **Shadcn UI** as our component library to build the UI efficiently and with a consistent style.
 
-### Structure
 
-Here's an overview of the folder structure within `client`:
 
-- `shared-components/`: Reusable UI components built with Shadcn UI.
-- `app/`: The application's app, following Next.js's file-based routing.
-- `public/`: Static assets like images and fonts.
-- `styles/`: Global styles and theme configurations for Shadcn UI.
+Set up environment variables:
+Create a .env file in the root directory with the following variables:
+port=9000
 
-## Shadcn UI Documentation
+## Dependencies
+Express.js
+MongoDB (using mongoose)
+dotenv (for environment variables)
+Jest and Supertest (for testing)
 
-For detailed documentation on using Shadcn UI components in your projects, please refer to the [Shadcn UI Documentation](https://ui.shadcn.com/docs). This will provide you with all the necessary information on how to implement and customize the components to fit the design requirements of our application.
+## Testing
+To run tests, use the following command:
+
+npm test
+
+## Deployment
+For deployment to production, ensure to set up environment variables for the production environment.
 
 ## Contributing
+Contributions are welcome! Please fork the repository and submit pull requests to contribute to the project.
 
-We welcome contributions from all developers. Please read our CONTRIBUTING.md file for guidelines on how to make contributions.
-
-## Support
-
-If you encounter any issues or have questions, please file an issue in the repository.
-
-Thank you for being a part of the Fourstrides team!
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
