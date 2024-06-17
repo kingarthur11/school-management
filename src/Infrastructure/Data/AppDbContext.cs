@@ -2,6 +2,7 @@
 using Core.Entities.Users;
 using Infrastructure.Data.Config;
 using Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -9,7 +10,7 @@ using System.Reflection.Emit;
 
 namespace Infrastructure.Data
 {
-    public class AppDbContext : IdentityDbContext<Persona, Role, Guid>
+    public class AppDbContext : IdentityDbContext<User, Role, Guid>
     {
         private readonly DbContextOptions _options;
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
@@ -52,6 +53,34 @@ namespace Infrastructure.Data
                 }
             });
 
+            builder.Entity<IdentityUser>(entity =>
+            {
+                entity.ToTable(name: "User");
+            });
+            builder.Entity<IdentityRole>(entity =>
+            {
+                entity.ToTable(name: "Role");
+            });
+            builder.Entity<IdentityUserRole<string>>(entity =>
+            {
+                entity.ToTable("UserRoles");
+            });
+            builder.Entity<IdentityUserClaim<string>>(entity =>
+            {
+                entity.ToTable("UserClaims");
+            });
+            builder.Entity<IdentityUserLogin<string>>(entity =>
+            {
+                entity.ToTable("UserLogins");
+            });
+            builder.Entity<IdentityRoleClaim<string>>(entity =>
+            {
+                entity.ToTable("RoleClaims");
+            });
+            builder.Entity<IdentityUserToken<string>>(entity =>
+            {
+                entity.ToTable("UserTokens");
+            });
 
             builder.Entity<Parent>()
                     .HasMany(e => e.Students)
