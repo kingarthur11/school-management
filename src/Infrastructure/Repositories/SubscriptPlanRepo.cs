@@ -14,13 +14,43 @@ namespace Infrastructure.Repositories
         {
             _dbContext = dataContex;
         }
-        public async Task<SubscriptPlan> ShowSubscriptPlanAsync(Guid id)
+        public async Task<ApiResponse<SubscribePlanResponse>> ShowSubscriptPlanAsync(Guid id)
         {
-            return await _dbContext.SubscriptPlans.FirstOrDefaultAsync(subscription => subscription.Id == id);
+            var result = await _dbContext.SubscriptPlans.FirstOrDefaultAsync(subscription => subscription.Id == id);
+            if (result == null)
+            {
+                return new ApiResponse<SubscribePlanResponse>()
+                {
+                    Data = null,
+                    Message = "Subscription plan not found"
+                };
+            }
+            return new ApiResponse<SubscribePlanResponse>()
+            {
+                Data = new SubscribePlanResponse()
+                {
+                    Id = result.Id,
+                    Name = result.Name,
+                    Price = result.Price,
+                    StudentEnrollment = result.StudentEnrollment
+                }
+            };
         }
-        public async Task<IEnumerable<SubscriptPlan>> GetAllSubscriptPlansAsync()
+        public async Task<ApiResponse<List<SubscribePlanResponse>>> GetAllSubscriptPlansAsync()
         {
-            return await _dbContext.SubscriptPlans.ToListAsync();
+            var response = new ApiResponse<List<SubscribePlanResponse>>();
+            var students = _dbContext.SubscriptPlans
+                .Select(x => new SubscribePlanResponse()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Price = x.Price,
+                    StudentEnrollment = x.StudentEnrollment
+                })
+                .AsNoTracking();
+
+            response.Data = await students.ToListAsync();
+            return response;
         }
 
         public async Task<BaseResponse> AddAsync(Trip trip)
