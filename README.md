@@ -1,18 +1,16 @@
-# Fourstrides Prototype Client Repository
+# prototype.service
+# Fourstrides Prototype Service Repository
 
-Welcome to the Fourstrides company repository. This repository is home to our prototype client built with next js, which resides in the `client` folder.
-
-## Getting Started
+Welcome to the Fourstrides company repository. This repository is home to our prototype service built with node js, which resides in the `service` folder.
 
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
+Ensure you have Node.js and npm installed on your machine.
 
-- Node.js (LTS version)
-- npm
+- Node.js (v20.13.1)
+- npm (10.5.2)
 
 ### Installation
-
 To get started with this project, follow these steps:
 
 1. Clone the repository:
