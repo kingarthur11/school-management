@@ -34,6 +34,14 @@ namespace Infrastructure.Repositories
             _userManager = userManager;
             _dbContext = dataContex;
         }
+
+        // public async Task<string> GetJwtResponse()
+        // {
+        //     var emailClaim = await _userManager.GetClaimsAsync(user)
+        //                          .ContinueWith(task => task.Result.FirstOrDefault(c => c.Type == ClaimTypes.Email));
+        //     // var jwtResponse = await  _userManager.Users.FindFirstValue(ClaimTypes.Email);
+        //     return jwtResponse;
+        // }
         public async Task<ApiResponse<List<UserResponse>>> GetAllUsersAsync()
         {
             var response = new ApiResponse<List<UserResponse>>();
@@ -107,12 +115,12 @@ namespace Infrastructure.Repositories
             {
                throw new NotFoundException($"Request body cannot be empty.");
             }
-            // var newTenant = new Tenant()
-            // {
-            //     Id = request.SchoolAlias,
-            //     Name = request.SchoolAlias,
-            //     TenantAdminEmail = request.Email
-            // };
+            var newTenant = new Tenant()
+            {
+                Id = request.SchoolAlias,
+                Name = request.SchoolAlias,
+                TenantAdminEmail = request.Email
+            };
 
             var newUser = new User() 
             {
@@ -154,16 +162,16 @@ namespace Infrastructure.Repositories
                throw new BadRequestException($"User school alias already exist.");
             }
             
-            // var tenantResult = await _dbContext.Tenants.AddAsync(newTenant);
+            var tenantResult = await _dbContext.Tenants.AddAsync(newTenant);
             await _dbContext.SaveChangesAsync();
 
-            // var newTenantId = tenantResult.Entity.Id;
-            // newUser.TenantId = newTenantId;
+            var newTenantId = tenantResult.Entity.Id;
+            newUser.TenantId = newTenantId;
 
             var result = await _userManager.CreateAsync(newUser, request.Password);
             var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == request.Email);
             
-            var token = GenerateNewJwtToken(newUser);
+            var token = GenerateNewJwtToken(newUser, newTenantId);
             return new ApiResponse<AuthenticateResponse>()
             {
                 Data = new AuthenticateResponse()
@@ -191,8 +199,8 @@ namespace Infrastructure.Repositories
             {
                throw new BadRequestException($"User password mismatch.");
             }
-            // var token = GenerateJwtToken(userByEmail);
-            var token = GenerateNewJwtToken(userByEmail);
+            // var result = await _dbContext.SubscriptPlans.FirstOrDefaultAsync(subscription => subscription.Id == id);
+            var token = GenerateNewJwtToken(userByEmail, userByEmail.Entity.Id);
             return new ApiResponse<AuthenticateResponse>()
             {
                 Data = new AuthenticateResponse()
@@ -208,17 +216,18 @@ namespace Infrastructure.Repositories
             // return new AuthenticateResponse(userByEmail, token);
         }
 
-        private string GenerateNewJwtToken(User user)
+        private string GenerateNewJwtToken(User user, string newTenantId)
         {
+            // string UserId = user.Id.ToString();
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Key"));
-            // var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(new[] 
                 { 
+                    new Claim("id", user.Id),
                     new Claim("email", user.Email),
-                    // new Claim("TenantId", tenantId),
+                    new Claim("TenantId", tenantId),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? ""),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),

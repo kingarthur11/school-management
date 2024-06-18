@@ -5,10 +5,11 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Shared.Enums;
+using UserService.Models;
 
 namespace Core.Entities
 {
-    public class User : IdentityUser
+    public class User : IdentityUser, ITenant
     {
         public Guid Id { get; set; }
         public string FirstName { get; set; } = string.Empty;

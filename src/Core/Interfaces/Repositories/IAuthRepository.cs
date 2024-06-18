@@ -21,6 +21,7 @@ namespace Core.Interfaces.Repositories
         Task<ApiResponse<UserResponse>> ShowUserByEmailAsync(string email);
         Task<ApiResponse<AuthenticateResponse>> RegisterUserAsync(CreateUserDTO user);
         Task<ApiResponse<AuthenticateResponse>> Login(AuthenticateRequest model);
+        // Task<string> GetJwtResponse();
 
         // Task<ApiResponse<UserResponse>> TestUserAsyn(AuthenticateRequest model);
     }
