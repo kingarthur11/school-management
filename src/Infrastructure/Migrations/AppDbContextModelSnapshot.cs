@@ -448,9 +448,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.Tenant", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -758,11 +757,20 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("SubscriptPlanId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("TenantId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IsDeleted");
 
                     b.HasIndex("SubscriptPlanId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserSubscripts");
                 });
@@ -1399,7 +1407,15 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("SubscriptPlan");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Core.Entities.Users.Busdriver", b =>
