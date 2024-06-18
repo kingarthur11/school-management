@@ -1,8 +1,9 @@
 ﻿using Shared.Enums;
+using UserService.Models;
 
 namespace Core.Entities.Users
 {
-    public class Parent : BaseEntity
+    public class Parent : BaseEntity, ITenant
     {
         //UserId or PersonaId
         public Guid PersonaId { get; set; }
@@ -24,7 +25,7 @@ namespace Core.Entities.Users
 
         public List<Student>? Students { get; set; }
 
-
+        public string? TenantId { get; set; }
         public void Delete(string deletor)
         {
             IsDeleted = true;

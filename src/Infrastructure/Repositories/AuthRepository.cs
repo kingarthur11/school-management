@@ -126,7 +126,7 @@ namespace Infrastructure.Repositories
             {
                 Email = request.Email,
                 UserName = request.SchoolAlias,
-                // TenantId = request.SchoolAlias,
+                TenantId = request.SchoolAlias,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 PhoneNumber = request.PhoneNumber,
