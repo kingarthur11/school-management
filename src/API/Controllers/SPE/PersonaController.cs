@@ -47,12 +47,24 @@ namespace API.Controllers.SPE
         // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         // [HttpPost("create-parent")]
         // public async Task<ActionResult<ApiResponse<ParentResponse>>> CreateParentAsync([FromForm] CreateParentRequest request)
         // {
-        //     var host = Request.Host.ToString();
-        //     var response = await _personaService.CreateParentAsync(request, host);
-        //     return HandleResult(response);
+        //     var jwtIdClaim = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti);
+        //     if (jwtIdClaim != null)
+        //     {
+        //         var jwtId = jwtIdClaim.Value;
+        //         return Ok(new { JwtId = jwtId });
+        //     }
+        //     else
+        //     {
+        //         // Handle case where "jti" claim is not found
+        //         return NotFound();
+        //     }
+        //     // var host = Request.Host.ToString();
+        //     // var response = await _personaService.CreateParentAsync(request, host);
+        //     // return HandleResult(response);
         // }
 
 

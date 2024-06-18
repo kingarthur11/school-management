@@ -9,6 +9,7 @@ using Shared.Models.Requests;
 using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 using UserService.Models.ResponseBody;
+using System.Security.Claims;
 
 namespace API.Controllers.Auth
 {
@@ -25,6 +26,30 @@ namespace API.Controllers.Auth
             // _httpContextAccessor = httpContextAccessor;
             _authRepository = usersRepository;
         }
+        [HttpGet("email")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult GetEmailClaim()
+        {
+            var emailClaim = User.FindFirst(ClaimTypes.Email);
+
+            if (emailClaim != null)
+            {
+                var email = emailClaim.Value;
+                return Ok(new { Email = email });
+            }
+            else
+            {
+                return NotFound("Email claim not found for the user");
+            }
+        }
+        // [HttpGet("jwt")]
+        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        // public async Task<ActionResult> Get()
+        // {
+        //     var emailClaim = User.FindFirst(ClaimTypes.Email);
+        //     // string name = await _authRepository.GetJwtResponse();
+        //     return Ok(emailClaim);
+        // }
         // [SwaggerOperation(
         //       Summary = "Create a new Parent Endpoint",
         //       Description = "This endpoint creates a new Parent. It requires Admin privilege",
@@ -63,14 +88,20 @@ namespace API.Controllers.Auth
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<ApiResponse<UserResponse>>> Show(Guid id)
         {
-            var response = await _authRepository.ShowUserByIdAsync(id);
-            return HandleResult(response);
-            // var user = await _authRepository.ShowUserByIdAsync(id);
-            // if (user == null)
+            // var jwtIdClaim = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti);
+            // if (jwtIdClaim != null)
             // {
+            //     var jwtId = jwtIdClaim.Value;
+            //     return Ok(new { JwtId = jwtId });
+            // }
+            // else
+            // {
+            //     // Handle case where "jti" claim is not found
             //     return NotFound();
             // }
-            // return Ok(user);
+            var response = await _authRepository.ShowUserByIdAsync(id);
+            return HandleResult(response);
+            
         }
         // [SwaggerOperation(
         //       Summary = "Create a new Parent Endpoint",
