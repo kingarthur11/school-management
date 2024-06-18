@@ -10,8 +10,7 @@ namespace Core.Entities.Users
     public class Student : BaseEntity, ITenant
     {
         //UserId or PersonaId
-        public string? PersonaId { get; set; }
-
+        public Guid PersonaId { get; set; }
         public string LastName { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string FullName { get => $"{FirstName} {LastName}"; }
