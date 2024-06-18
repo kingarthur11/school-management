@@ -57,6 +57,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("NumberOfSeat")
                         .HasColumnType("integer");
 
+                    b.Property<string>("TenantId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IsDeleted");
@@ -817,14 +820,17 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("Modified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("PersonaId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("PersonaId")
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhotoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -893,8 +899,8 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Occupation")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("PersonaId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("PersonaId")
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
@@ -904,6 +910,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("PostalAddress")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -1002,14 +1011,17 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("Modified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("PersonaId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("PersonaId")
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhotoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -1106,8 +1118,8 @@ namespace Infrastructure.Migrations
                     b.Property<string>("PermanentAddress")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("PersonaId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("PersonaId")
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
@@ -1125,6 +1137,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("State")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");

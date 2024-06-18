@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240618120126_first-migrations")]
-    partial class firstmigrations
+    [Migration("20240618155443_first-migrationsssss")]
+    partial class firstmigrationsssss
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,6 +59,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("NumberOfSeat")
                         .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -820,14 +823,17 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("Modified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("PersonaId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("PersonaId")
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhotoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -896,8 +902,8 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Occupation")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("PersonaId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("PersonaId")
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
@@ -907,6 +913,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("PostalAddress")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -1005,14 +1014,17 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("Modified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("PersonaId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("PersonaId")
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhotoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -1109,8 +1121,8 @@ namespace Infrastructure.Migrations
                     b.Property<string>("PermanentAddress")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("PersonaId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("PersonaId")
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
@@ -1128,6 +1140,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("State")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");

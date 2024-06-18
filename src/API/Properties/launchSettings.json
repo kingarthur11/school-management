@@ -83,7 +83,11 @@
         "IT_HEAD_EMAIL": "it@smsabuja.com",
         "IT_HEAD_PHONENUMBER": "08060216275",
         "IT_HEAD_PASSWORD": "DefaultPass@1234",
-        "JWT_SECRET_KEY": "SampleKey&392929SampleKey&392929SampleKey&392929"
+        "JWT_SECRET_KEY": "SampleKey&392929SampleKey&392929SampleKey&392929",
+        "Key": "NvKYFvdIaiByWMpqtUnC94L3GvX6bm3BZvtfFHnNsWmz0zzm6FWZXIuFcmYvXOhgAReSe5mm3gyVr0c2hxWH9890PBXkhnqrqjwU",
+        "Issuer": "JWTAuthenticationServer",
+        "Audience": "JWTServicePostmanClient",
+        "Subject": "JWTServiceAccessToken"
       },
       "dotnetRunMessages": true
     },
