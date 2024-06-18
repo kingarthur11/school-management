@@ -16,49 +16,51 @@ using Infrastructure.Data;
 using Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared.Models.Requests;
+using Core.Entities;
 
 namespace Core.Services
 {
     public class PersonaService : IPersonaService
     {
-        // private readonly UserManager<Persona> _userManager;
-        // private readonly ILogger<PersonaService> _logger;
-        // private readonly HttpContext _httpContext;
-        // private readonly AppDbContext _dbContext;
-        // private readonly IWebHostEnvironment _webHost;
-        // private readonly IMediator _mediator;
+        private readonly UserManager<User> _userManager;
+        private readonly ILogger<PersonaService> _logger;
+        private readonly HttpContext _httpContext;
+        private readonly AppDbContext _dbContext;
+        private readonly IWebHostEnvironment _webHost;
+        private readonly IMediator _mediator;
 
-        // public PersonaService(UserManager<Persona> userManager,
-        //     ILogger<PersonaService> logger,
-        //     IHttpContextAccessor httpContextAccessor,
-        //     AppDbContext dbContext,
-        //     IWebHostEnvironment webHost,
-        //     IMediator mediator)
-        // {
-        //     _userManager = userManager;
-        //     _logger = logger;
-        //     _httpContext = httpContextAccessor.HttpContext!;
-        //     _dbContext = dbContext;
-        //     _webHost = webHost;
-        //     _mediator = mediator;
-        // }
-
-
-        // private static string GetRoleToAdd(PersonaType type)
-        // {
-        //     var role = type switch
-        //     {
-        //         PersonaType.Parent => AuthConstants.Roles.PARENT,
-        //         PersonaType.Student => AuthConstants.Roles.STUDENT,
-        //         PersonaType.Staff => AuthConstants.Roles.STAFF,
-        //         PersonaType.BusDriver => AuthConstants.Roles.BUS_DRIVER,
-        //         _ => default,
-        //     };
-        //     return role;
-        // }
+        public PersonaService(
+            UserManager<User> userManager,
+            ILogger<PersonaService> logger,
+            IHttpContextAccessor httpContextAccessor,
+            AppDbContext dbContext,
+            IWebHostEnvironment webHost,
+            IMediator mediator)
+        {
+            _userManager = userManager;
+            _logger = logger;
+            _httpContext = httpContextAccessor.HttpContext!;
+            _dbContext = dbContext;
+            _webHost = webHost;
+            _mediator = mediator;
+        }
 
 
-        public async Task<ApiResponse<ParentResponse>> CreateParentAsync(CreateParentRequest request, string host)
+        private static string GetRoleToAdd(PersonaType type)
+        {
+            var role = type switch
+            {
+                PersonaType.Parent => AuthConstants.Roles.PARENT,
+                PersonaType.Student => AuthConstants.Roles.STUDENT,
+                PersonaType.Staff => AuthConstants.Roles.STAFF,
+                PersonaType.BusDriver => AuthConstants.Roles.BUS_DRIVER,
+                _ => default,
+            };
+            return role;
+        }
+
+
+        public async Task<ApiResponse<ParentResponse>> CreateParentAsync(CreateParentRequest request, string host, string tenantId, string email)
         {
             var response = new ApiResponse<ParentResponse>() { Code = ResponseCodes.Status201Created };
             if (!string.Equals(request.Password, request.ConfirmPassword))
@@ -82,29 +84,27 @@ namespace Core.Services
             }
             _logger.LogInformation("Photo uploaded sucessfuly");
 
-            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
-            var emailClaim = User.FindFirst(ClaimTypes.Email);
-            if (tenantIdClaim == null || emailClaim == null)
+            var user = new User() { 
+                Id = Guid.NewGuid() ,
+                UserName = request.Email, 
+                Email = request.Email, 
+                PhoneNumber = request.PhoneNumber, 
+                FirstName = request.FirstName, 
+                LastName = request.LastName, 
+                EmailConfirmed = true, 
+                TenantId = tenantId,
+                PhotoUrl = photoUrl, 
+                PesonaType = PersonaType.Parent 
+            };
+            var creationResult = await _userManager.CreateAsync(user, request.Password);
+            if (!creationResult.Succeeded)
             {
+                response.Code = ResponseCodes.Status400BadRequest;
                 response.Status = false;
-                response.Message = "Tenant does not exist";
-                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Message = string.Join(',', creationResult.Errors.Select(a => a.Description));
+                _logger.LogInformation("Parent Creation is not successful with the following error {0}", response.Message);
                 return response;
-                // var tenantId = tenantIdClaim.Value;
-                // return Ok(new { TenantId = tenantId });
             }
-            var tenantId = tenantIdClaim.Value;
-            var email = emailClaim.Value;
-            // var user = new Persona() { Id = Guid.NewGuid() ,UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Parent };
-            // var creationResult = await _userManager.CreateAsync(user, request.Password);
-            // if (!creationResult.Succeeded)
-            // {
-            //     response.Code = ResponseCodes.Status400BadRequest;
-            //     response.Status = false;
-            //     response.Message = string.Join(',', creationResult.Errors.Select(a => a.Description));
-            //     _logger.LogInformation("Parent Creation is not successful with the following error {0}", response.Message);
-            //     return response;
-            // }
 
             var parent = new Parent()
             {
@@ -140,7 +140,7 @@ namespace Core.Services
             }
 
             var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber};
-            _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
+            // _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
 
             //if (roleResult.Succeeded)
             //{
@@ -150,196 +150,193 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor)
-        {
-            var response = new BaseResponse();
+        // public async Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor)
+        // {
+        //     var response = new BaseResponse();
 
-            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == parentId);
-            if (parent is null)
-            {
-                response.Code = ResponseCodes.Status404NotFound;
-                response.Status = false;
-                response.Message = "Parent not found";
-                return response;
-            }
+        //     var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == parentId);
+        //     if (parent is null)
+        //     {
+        //         response.Code = ResponseCodes.Status404NotFound;
+        //         response.Status = false;
+        //         response.Message = "Parent not found";
+        //         return response;
+        //     }
 
-            parent.FirstName = request.FirstName ?? parent.FirstName;
-            parent.LastName = request.LastName ?? parent.LastName;
-            parent.Edit(editor);
+        //     parent.FirstName = request.FirstName ?? parent.FirstName;
+        //     parent.LastName = request.LastName ?? parent.LastName;
+        //     parent.Edit(editor);
 
-            if (!(await _dbContext.TrySaveChangesAsync()))
-            {
-                response.Code = ResponseCodes.Status500InternalServerError;
-                response.Status = false;
-                response.Message = "Unable to update parent";
-                return response;
-            }
+        //     if (!(await _dbContext.TrySaveChangesAsync()))
+        //     {
+        //         response.Code = ResponseCodes.Status500InternalServerError;
+        //         response.Status = false;
+        //         response.Message = "Unable to update parent";
+        //         return response;
+        //     }
 
-            // var persona = await _userManager.FindByIdAsync(parent.PersonaId.ToString());
-            // if (persona is null)
-            // {
-            //     _logger.LogInformation("Parent account not found. Update not completed");
-            // }
-            // else
-            // {
-            //     persona.FirstName = request.FirstName ?? persona.FirstName;
-            //     persona.LastName = request.LastName ?? persona.LastName;
-            //     await _userManager.UpdateAsync(persona);
-            // }
-
-
-            return response;
-        }
+        //     // var persona = await _userManager.FindByIdAsync(parent.PersonaId.ToString());
+        //     // if (persona is null)
+        //     // {
+        //     //     _logger.LogInformation("Parent account not found. Update not completed");
+        //     // }
+        //     // else
+        //     // {
+        //     //     persona.FirstName = request.FirstName ?? persona.FirstName;
+        //     //     persona.LastName = request.LastName ?? persona.LastName;
+        //     //     await _userManager.UpdateAsync(persona);
+        //     // }
 
 
+        //     return response;
+        // }
+        // public async Task<ApiResponse<StudentResponse>> CreateStudentAsync(CreateStudentRequest request, string host, string tenantId, string email)
+        // {
+        //     var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status201Created };
 
-        public async Task<ApiResponse<StudentResponse>> CreateStudentAsync(CreateStudentRequest request, string host)
-        {
-            var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status201Created };
+        //     if (!string.Equals(request.Password, request.ConfirmPassword))
+        //     {
+        //         response.Status = false;
+        //         response.Code = ResponseCodes.Status400BadRequest;
+        //         response.Message = "Password Field not the same as that of ConfirmPassword field";
+        //         return response;
+        //     }
 
-            if (!string.Equals(request.Password, request.ConfirmPassword))
-            {
-                response.Status = false;
-                response.Code = ResponseCodes.Status400BadRequest;
-                response.Message = "Password Field not the same as that of ConfirmPassword field";
-                return response;
-            }
+        //     var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == request.ParentId);
+        //     if (parent is null)
+        //     {
+        //         response.Code = ResponseCodes.Status400BadRequest;
+        //         response.Status = false;
+        //         response.Message = "Invaild ParentId";
+        //         return response;
+        //     }
 
-            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == request.ParentId);
-            if (parent is null)
-            {
-                response.Code = ResponseCodes.Status400BadRequest;
-                response.Status = false;
-                response.Message = "Invaild ParentId";
-                return response;
-            }
+        //     _logger.LogInformation("Creating a new Student");
+        //     _logger.LogInformation("Trying to upload photo of new Student");
 
-            _logger.LogInformation("Creating a new Student");
-            _logger.LogInformation("Trying to upload photo of new Student");
+        //     string photoUrl = UploadPhoto(request.Photo, "student-images", "student-");
+        //     if (string.IsNullOrWhiteSpace(photoUrl))
+        //     {
+        //         response.Status = false;
+        //         response.Message = "Unable to upload student's photo. Please try again.";
+        //         response.Code = ResponseCodes.Status500InternalServerError;
+        //         return response;
+        //     }
+        //     _logger.LogInformation("Photo uploaded sucessfuly");
 
-            string photoUrl = UploadPhoto(request.Photo, "student-images", "student-");
-            if (string.IsNullOrWhiteSpace(photoUrl))
-            {
-                response.Status = false;
-                response.Message = "Unable to upload student's photo. Please try again.";
-                response.Code = ResponseCodes.Status500InternalServerError;
-                return response;
-            }
-            _logger.LogInformation("Photo uploaded sucessfuly");
+        //     Persona user;
+        //     string emailExist = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com");
 
-            Persona user;
-            string emailExist = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com");
+        //     var tenantId = tenantIdClaim.Value;
+        //     var email = emailClaim.Value;
 
-            var tenantId = tenantIdClaim.Value;
-            var email = emailClaim.Value;
+        //     // int sameEmailCount = await _dbContext.Users.CountAsync(x => x.Email == emailExist);
+        //     // if (sameEmailCount is not 0)
+        //     // {
+        //     //     emailExist = string.Concat(request.FirstName, request.LastName,$"{sameEmailCount++}","@","smsabuja", ".com");
+        //     //     user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = emailExist, UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
+        //     // }
+        //     // else
+        //     // {
+        //     //     user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"), UserName = string.Concat(request.FirstName,  request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
+        //     // }
 
-            // int sameEmailCount = await _dbContext.Users.CountAsync(x => x.Email == emailExist);
-            // if (sameEmailCount is not 0)
-            // {
-            //     emailExist = string.Concat(request.FirstName, request.LastName,$"{sameEmailCount++}","@","smsabuja", ".com");
-            //     user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = emailExist, UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
-            // }
-            // else
-            // {
-            //     user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"), UserName = string.Concat(request.FirstName,  request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
-            // }
+        //     // var creationResult = await _userManager.CreateAsync(user, request.Password);
+        //     // if (!creationResult.Succeeded)
+        //     // {
+        //     //     response.Code = ResponseCodes.Status400BadRequest;
+        //     //     response.Status = false;
+        //     //     response.Message = string.Join(',', creationResult.Errors.Select(a => a.Description));
+        //     //     _logger.LogInformation("Student Creation is not successful with the following error {0}", response.Message);
+        //     //     return response;
+        //     // }
 
-            // var creationResult = await _userManager.CreateAsync(user, request.Password);
-            // if (!creationResult.Succeeded)
-            // {
-            //     response.Code = ResponseCodes.Status400BadRequest;
-            //     response.Status = false;
-            //     response.Message = string.Join(',', creationResult.Errors.Select(a => a.Description));
-            //     _logger.LogInformation("Student Creation is not successful with the following error {0}", response.Message);
-            //     return response;
-            // }
+        //     Student student;
 
-            Student student;
+        //     if (request.BusServiceRequired)
+        //     {
+        //         var bus = await _dbContext.Buses.FirstOrDefaultAsync(x => x.Id == request.BusId);
+        //         if (bus is null)
+        //         {
+        //             response.Status = false;
+        //             response.Code = ResponseCodes.Status400BadRequest;
+        //             response.Message = "Bus doesnt exist";
+        //             return response;
+        //         }
 
-            if (request.BusServiceRequired)
-            {
-                var bus = await _dbContext.Buses.FirstOrDefaultAsync(x => x.Id == request.BusId);
-                if (bus is null)
-                {
-                    response.Status = false;
-                    response.Code = ResponseCodes.Status400BadRequest;
-                    response.Message = "Bus doesnt exist";
-                    return response;
-                }
-
-                student = new Student()
-                {
-                    Id = Guid.NewGuid(),
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
-                    PhotoUrl = photoUrl,
-                    PersonaId = email,
-                    TenantId = tenantId,
-                    Email = user.Email,
-                    GradeId = request.GradeId,
-                    BusId = request.BusId,
-                    BusServiceRequired = request.BusServiceRequired,
-                };
-            }
-            else
-            {
-                student = new Student()
-                {
-                    Id = Guid.NewGuid(),
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
-                    PhotoUrl = photoUrl,
-                    PersonaId = email,
-                    TenantId = tenantId,
-                    Email = user.Email,
-                    GradeId = request.GradeId,
-                    BusServiceRequired = request.BusServiceRequired,
-                };
-            }
-
-
-            await _dbContext.Students.AddAsync(student);
-            if (!await _dbContext.TrySaveChangesAsync())
-            {
-                _logger.LogInformation("Unable create Student entity.");
-                response.Status = false;
-                response.Message = "Unable create Students entity.";
-                response.Code = ResponseCodes.Status500InternalServerError;
-                return response;
-            }
-
-            var parentStudent = new ParentStudent()
-            {
-                StudentsId = student.Id,
-                ParentsId = parent.Id,
-            };
-            await _dbContext.ParentStudent.AddAsync(parentStudent);
-            await _dbContext.TrySaveChangesAsync();
-
-            _logger.LogInformation("Student Creation is successful");
-
-            var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STUDENT);
-            if (!roleResult.Succeeded)
-            {
-                _logger.LogInformation("Unable add user to Student role.");
-                response.Status = false;
-                response.Message = "Unable add user to Student role.";
-                response.Code = ResponseCodes.Status500InternalServerError;
-                return response;
-            }
-
-            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
-            _ = _mediator.Publish(new NewStudentCreatedEvent(personaResponse, request.Password, parent.FullName, parent.Email));
+        //         student = new Student()
+        //         {
+        //             Id = Guid.NewGuid(),
+        //             FirstName = request.FirstName,
+        //             LastName = request.LastName,
+        //             PhotoUrl = photoUrl,
+        //             PersonaId = email,
+        //             TenantId = tenantId,
+        //             Email = user.Email,
+        //             GradeId = request.GradeId,
+        //             BusId = request.BusId,
+        //             BusServiceRequired = request.BusServiceRequired,
+        //         };
+        //     }
+        //     else
+        //     {
+        //         student = new Student()
+        //         {
+        //             Id = Guid.NewGuid(),
+        //             FirstName = request.FirstName,
+        //             LastName = request.LastName,
+        //             PhotoUrl = photoUrl,
+        //             PersonaId = email,
+        //             TenantId = tenantId,
+        //             Email = user.Email,
+        //             GradeId = request.GradeId,
+        //             BusServiceRequired = request.BusServiceRequired,
+        //         };
+        //     }
 
 
-            response.Data = new StudentResponse() {StudentId = student.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
+        //     await _dbContext.Students.AddAsync(student);
+        //     if (!await _dbContext.TrySaveChangesAsync())
+        //     {
+        //         _logger.LogInformation("Unable create Student entity.");
+        //         response.Status = false;
+        //         response.Message = "Unable create Students entity.";
+        //         response.Code = ResponseCodes.Status500InternalServerError;
+        //         return response;
+        //     }
 
-            //if (roleResult.Succeeded)
-            //{
-            //    await _auditTrailService.AddAsync(createTrail(AuditActions.Create, null, user.ToJson(), $"Created new user: {user.Email}"));
-            //}
-            return response;
-        }
+        //     var parentStudent = new ParentStudent()
+        //     {
+        //         StudentsId = student.Id,
+        //         ParentsId = parent.Id,
+        //     };
+        //     await _dbContext.ParentStudent.AddAsync(parentStudent);
+        //     await _dbContext.TrySaveChangesAsync();
+
+        //     _logger.LogInformation("Student Creation is successful");
+
+        //     var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STUDENT);
+        //     if (!roleResult.Succeeded)
+        //     {
+        //         _logger.LogInformation("Unable add user to Student role.");
+        //         response.Status = false;
+        //         response.Message = "Unable add user to Student role.";
+        //         response.Code = ResponseCodes.Status500InternalServerError;
+        //         return response;
+        //     }
+
+        //     var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
+        //     _ = _mediator.Publish(new NewStudentCreatedEvent(personaResponse, request.Password, parent.FullName, parent.Email));
+
+
+        //     response.Data = new StudentResponse() {StudentId = student.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
+
+        //     //if (roleResult.Succeeded)
+        //     //{
+        //     //    await _auditTrailService.AddAsync(createTrail(AuditActions.Create, null, user.ToJson(), $"Created new user: {user.Email}"));
+        //     //}
+        //     return response;
+        // }
        
         
         // public async Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor)
@@ -1017,56 +1014,56 @@ namespace Core.Services
 
 
 
-        // private string UploadPhoto(IFormFile? photo, string folder, string fileNameAlias)
-        // {
-        //     string folderPath = "static";
+        private string UploadPhoto(IFormFile? photo, string folder, string fileNameAlias)
+        {
+            string folderPath = "static";
 
-        //     string path = Path.Combine(_webHost.ContentRootPath, folderPath, folder);
-        //     if (!Directory.Exists(path))
-        //     {
-        //         Directory.CreateDirectory(path);
-        //     }
+            string path = Path.Combine(_webHost.ContentRootPath, folderPath, folder);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
 
-        //     if (photo != null && photo.Length > 0)
-        //     {
-        //         //Getting FileName
-        //         var fileName = Path.GetFileName(photo.FileName);
-        //         //Assigning Unique Filename (Guid)
-        //         var myUniqueFileName = Convert.ToString(Guid.NewGuid());
-        //         //Getting file Extension
-        //         var fileExtension = Path.GetExtension(fileName);
-        //         // concatenating  FileName + FileExtension
-        //         var newFileName = String.Concat(fileNameAlias, myUniqueFileName, fileExtension);
+            if (photo != null && photo.Length > 0)
+            {
+                //Getting FileName
+                var fileName = Path.GetFileName(photo.FileName);
+                //Assigning Unique Filename (Guid)
+                var myUniqueFileName = Convert.ToString(Guid.NewGuid());
+                //Getting file Extension
+                var fileExtension = Path.GetExtension(fileName);
+                // concatenating  FileName + FileExtension
+                var newFileName = String.Concat(fileNameAlias, myUniqueFileName, fileExtension);
 
-        //         // Combines two strings into a path.
-        //         string filepath = string.Empty;
-        //         try
-        //         {
-        //             filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), folderPath, folder)).Root + $"{newFileName}";
-        //             using (FileStream fs = File.Create(filepath))
-        //             {
-        //                 photo?.CopyTo(fs);
-        //                 fs.Flush();
-        //             }
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             _logger.LogInformation("Error while uploading photo");
-        //             _logger.LogError(ex.Message);
-        //         }
+                // Combines two strings into a path.
+                string filepath = string.Empty;
+                try
+                {
+                    filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), folderPath, folder)).Root + $"{newFileName}";
+                    using (FileStream fs = File.Create(filepath))
+                    {
+                        photo?.CopyTo(fs);
+                        fs.Flush();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation("Error while uploading photo");
+                    _logger.LogError(ex.Message);
+                }
 
-        //         string prefixToRemove = Path.Combine(Directory.GetCurrentDirectory());
-        //         if (filepath.StartsWith(prefixToRemove))
-        //         {
-        //             filepath = filepath.Substring(prefixToRemove.Length);
-        //             Console.WriteLine(filepath);
-        //         }
+                string prefixToRemove = Path.Combine(Directory.GetCurrentDirectory());
+                if (filepath.StartsWith(prefixToRemove))
+                {
+                    filepath = filepath.Substring(prefixToRemove.Length);
+                    Console.WriteLine(filepath);
+                }
 
-        //         return filepath;
-        //     }
+                return filepath;
+            }
 
-        //     return string.Empty;
-        // }
+            return string.Empty;
+        }
 
     }
 

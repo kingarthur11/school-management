@@ -7,12 +7,12 @@ namespace Core.Interfaces.Services
 {
     public interface IPersonaService
     {
-        // public Task<ApiResponse<ParentResponse>> CreateParentAsync(CreateParentRequest request, string host);
+        public Task<ApiResponse<ParentResponse>> CreateParentAsync(CreateParentRequest request, string host, string tenantId, string email);
         // public Task<ApiResponse<List<ParentResponse>>> ParentListAsync();
         // public Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor);
         // public Task<ApiResponse<ParentResponse>> GetParentAsync(Guid parentId);
         // public Task<BaseResponse> DeleteParentAsync(Guid parentId, string deletor);
-        // public Task<ApiResponse<StudentResponse>> CreateStudentAsync(CreateStudentRequest request, string host);
+        // public Task<ApiResponse<StudentResponse>> CreateStudentAsync(CreateStudentRequest request, string host, string tenantId, string email);
         // public Task<ApiResponse<List<StudentResponse>>> StudentListAsync();
         // public Task<ApiResponse<StudentResponse>> GetStudentAsync(Guid studentId);
         // public Task<BaseResponse> DeleteStudnetAsync(Guid studentId, string deletor);

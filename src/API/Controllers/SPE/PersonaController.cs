@@ -12,6 +12,7 @@ using Shared.Models.Requests;
 using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
+using System.Security.Claims;
 
 namespace API.Controllers.SPE
 {
@@ -40,32 +41,43 @@ namespace API.Controllers.SPE
         //       OperationId = "parent.create",
         //       Tags = new[] { "PersonaEndpoints" })
         // ]
-        // [Produces(MediaTypeNames.Application.Json)]
-        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(ApiResponse<ParentResponse>), StatusCodes.Status201Created)]
-        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
-        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        // [HttpPost("create-parent")]
-        // public async Task<ActionResult<ApiResponse<ParentResponse>>> CreateParentAsync([FromForm] CreateParentRequest request)
-        // {
-        //     var jwtIdClaim = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti);
-        //     if (jwtIdClaim != null)
-        //     {
-        //         var jwtId = jwtIdClaim.Value;
-        //         return Ok(new { JwtId = jwtId });
-        //     }
-        //     else
-        //     {
-        //         // Handle case where "jti" claim is not found
-        //         return NotFound();
-        //     }
-        //     // var host = Request.Host.ToString();
-        //     // var response = await _personaService.CreateParentAsync(request, host);
-        //     // return HandleResult(response);
-        // }
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<ParentResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("create-parent")]
+        public async Task<ActionResult<ApiResponse<ParentResponse>>> CreateParentAsync([FromForm] CreateParentRequest request)
+        {
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var emailClaim = User.FindFirst(ClaimTypes.Email);
+            // if (tenantIdClaim == null || emailClaim == null)
+            // {
+            //     response.Status = false;
+            //     response.Message = "Tenant does not exist";
+            //     response.Code = ResponseCodes.Status500InternalServerError;
+            //     return response;
+            // }
+            var tenantId = tenantIdClaim.Value;
+            var email = emailClaim.Value;
+            // var jwtIdClaim = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti);
+            // if (jwtIdClaim != null)
+            // {
+            //     var jwtId = jwtIdClaim.Value;
+            //     return Ok(new { JwtId = jwtId });
+            // }
+            // else
+            // {
+            //     // Handle case where "jti" claim is not found
+            //     return NotFound();
+            // }
+            var host = Request.Host.ToString();
+            var response = await _personaService.CreateParentAsync(request, host, tenantId, email);
+            return HandleResult(response);
+        }
 
 
         // [Authorize(Policy = AuthConstants.Policies.ADMINS)]
@@ -85,8 +97,20 @@ namespace API.Controllers.SPE
         // [HttpPost("create-student")]
         // public async Task<ActionResult<ApiResponse<StudentResponse>>> CreateStudentAsync([FromForm] CreateStudentRequest request)
         // {
+        //     var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+        //     var emailClaim = User.FindFirst(ClaimTypes.Email);
+        //     if (tenantIdClaim == null || emailClaim == null)
+        //     {
+        //         response.Status = false;
+        //         response.Message = "Tenant does not exist";
+        //         response.Code = ResponseCodes.Status500InternalServerError;
+        //         return response;
+        //     }
+        //     var tenantId = tenantIdClaim.Value;
+        //     var email = emailClaim.Value;
+
         //     var host = Request.Host.ToString();
-        //     var response = await _personaService.CreateStudentAsync(request, host);
+        //     var response = await _personaService.CreateStudentAsync(request, host, tenantId, email);
         //     return HandleResult(response);
         // }
 
@@ -312,24 +336,36 @@ namespace API.Controllers.SPE
 
 
     //     [Authorize(Policy = AuthConstants.Policies.ADMINS)]
-    //     [SwaggerOperation(
-    //      Summary = "Edit Parent Endpoint",
-    //      Description = "This endpoint edits a parent. It requires Admin privilege",
-    //      OperationId = "parent.edit",
-    //      Tags = new[] { "PersonaEndpoints" })
-    //      ]
-    //     [Produces(MediaTypeNames.Application.Json)]
-    //     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-    //     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-    //     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-    //     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
-    //     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-    //     [HttpPut("edit-parent")]
-    //     public async Task<ActionResult<BaseResponse>> EditParentAsync(Guid parentId, [FromBody] EditParentRequest request)
-    //     {
-    //         var response = await _personaService.EditParentAsync(parentId, request, User.Identity!.Name ?? string.Empty);
-    //         return HandleResult(response);
-    //     }
+        // [SwaggerOperation(
+        //  Summary = "Edit Parent Endpoint",
+        //  Description = "This endpoint edits a parent. It requires Admin privilege",
+        //  OperationId = "parent.edit",
+        //  Tags = new[] { "PersonaEndpoints" })
+        //  ]
+        // [Produces(MediaTypeNames.Application.Json)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        // // [ProducesResponseType(typeof(BaseResponCreateStudentAsyncse), StatusCodes.Status500InternalServerError)]
+        // [HttpPut("edit-parent")]
+        // public async Task<ActionResult<BaseResponse>> EditParentAsync(Guid parentId, [FromBody] EditParentRequest request)
+        // {
+        //     // var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+        //     // var emailClaim = User.FindFirst(ClaimTypes.Email);
+        //     // if (tenantIdClaim == null || emailClaim == null)
+        //     // {
+        //     //     response.Status = false;
+        //     //     response.Message = "Tenant does not exist";
+        //     //     response.Code = ResponseCodes.Status500InternalServerError;
+        //     //     return response;
+        //     // }
+        //     // var tenantId = tenantIdClaim.Value;
+        //     // var email = emailClaim.Value;
+
+        //     var response = await _personaService.EditParentAsync(parentId, request, User.Identity!.Name ?? string.Empty);
+        //     return HandleResult(response);
+        // }
 
 
     //     [Authorize(Policy = AuthConstants.Policies.ADMINS)]

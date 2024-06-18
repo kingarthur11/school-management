@@ -139,7 +139,7 @@ try
 
     //Services
     // builder.Services.AddTransient<IAuthService, AuthService>();
-    // builder.Services.AddTransient<IPersonaService, PersonaService>();
+    builder.Services.AddTransient<IPersonaService, PersonaService>();
     builder.Services.AddTransient<ITokenService, TokenService>();
     builder.Services.AddTransient<IBusService, BusService>();
     builder.Services.AddTransient<ICampusService, CampusService>();
