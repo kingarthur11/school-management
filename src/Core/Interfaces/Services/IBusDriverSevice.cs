@@ -10,7 +10,7 @@ namespace Core.Interfaces.Services
 {
     public interface IBusDriverSevice
     {
-        public Task<BaseResponse> DeleteBusdriver(Guid id);
-        public Task<BaseResponse> EditBusdriver(EditBusdriverRequest request);
+        // public Task<BaseResponse> DeleteBusdriver(Guid id);
+        // public Task<BaseResponse> EditBusdriver(EditBusdriverRequest request);
     }
 }
