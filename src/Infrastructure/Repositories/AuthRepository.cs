@@ -124,7 +124,7 @@ namespace Infrastructure.Repositories
                 PhoneNumber = request.PhoneNumber,
                 SchoolName = request.SchoolName,
                 C_Password = request.C_Password,
-                CreatedAt = DateTime.UtcNow,
+                //CreatedAt = DateTime.UtcNow,
             };
             if (request.Password != request.C_Password)
             {
