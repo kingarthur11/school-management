@@ -8,6 +8,6 @@ using System.Threading.Tasks;
 
 namespace Core.Events
 {
-    public record ResetPasswordByAdminEvent(PersonaResponse Person, string newPassword) : INotification;
+    // public record ResetPasswordByAdminEvent(PersonaResponse Person, string newPassword) : INotification;
 
 }

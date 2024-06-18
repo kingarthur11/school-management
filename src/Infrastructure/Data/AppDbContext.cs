@@ -10,12 +10,12 @@ using System.Reflection.Emit;
 
 namespace Infrastructure.Data
 {
-    public class AppDbContext : IdentityDbContext<User, Role, Guid>
+    public class AppDbContext : IdentityDbContext<User>
     {
-        private readonly DbContextOptions _options;
+        // private readonly DbContextOptions _options;
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            _options = options;
+            // _options = options;
         }
 
         public DbSet<Student> Students { get; set; }
@@ -36,7 +36,7 @@ namespace Infrastructure.Data
         public DbSet<SubscriptPlan> SubscriptPlans { get; set; }
         public DbSet<SubscriptBenefits> SubscriptBenefits { get; set; }
         public DbSet<SubscriptPlanBenefit> SubscriptPlanBenefits { get; set; }
-        // public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<UserSubscript> UserSubscripts { get; set; }
 
 

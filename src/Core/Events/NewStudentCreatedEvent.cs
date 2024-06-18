@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Core.Events
 {
-    public record NewStudentCreatedEvent(PersonaResponse Person, string password, string parent, string parentEmail) : INotification;
+    // public record NewStudentCreatedEvent(PersonaResponse Person, string password, string parent, string parentEmail) : INotification;
 }

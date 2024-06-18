@@ -18,7 +18,7 @@ namespace API.Controllers.SPE
     //[Route("api/[controller]")]
     [Route("api/dashboard")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class DashboardController : BaseController
     {
         private readonly IQrCodeService _qrCodeService;
@@ -29,7 +29,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
+        // [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
         [SwaggerOperation(
         Summary = "Get List Of Students For A Parent Dashboard Endpoint",
         Description = "This endpoint gets the list of students for a Parent to be displayed in dashboard. It requires Parent privilege",

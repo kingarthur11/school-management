@@ -26,6 +26,7 @@ using System.Text;
 using static Shared.Constants.StringConstants;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Core.Entities;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
 Log.Information($"Starting up MyStar Web Server!");
@@ -105,19 +106,19 @@ try
         options.UseNpgsql(connectionString);
     });
 
-    builder.Services.AddIdentity<Persona, Role>(
-             options =>
-             {
-                 options.Password.RequireDigit = true;
-                 options.Password.RequireNonAlphanumeric = true;
-                 options.Password.RequireLowercase = true;
-                 options.Password.RequireUppercase = true;
-                 options.Password.RequiredLength = 8;
-                 options.User.RequireUniqueEmail = true;
-                 options.SignIn.RequireConfirmedEmail = true;
-             })
-             .AddEntityFrameworkStores<AppDbContext>()
-             .AddDefaultTokenProviders();
+    // builder.Services.AddIdentity<Persona, Role>(
+    //          options =>
+    //          {
+    //              options.Password.RequireDigit = true;
+    //              options.Password.RequireNonAlphanumeric = true;
+    //              options.Password.RequireLowercase = true;
+    //              options.Password.RequireUppercase = true;
+    //              options.Password.RequiredLength = 8;
+    //              options.User.RequireUniqueEmail = true;
+    //              options.SignIn.RequireConfirmedEmail = true;
+    //          })
+    //          .AddEntityFrameworkStores<AppDbContext>()
+    //          .AddDefaultTokenProviders();
 
     builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
     builder.Services.AddTransient<IEmailService, SmtpEmailSender>();
@@ -137,8 +138,8 @@ try
 
 
     //Services
-    builder.Services.AddTransient<IAuthService, AuthService>();
-    builder.Services.AddTransient<IPersonaService, PersonaService>();
+    // builder.Services.AddTransient<IAuthService, AuthService>();
+    // builder.Services.AddTransient<IPersonaService, PersonaService>();
     builder.Services.AddTransient<ITokenService, TokenService>();
     builder.Services.AddTransient<IBusService, BusService>();
     builder.Services.AddTransient<ICampusService, CampusService>();
@@ -149,36 +150,65 @@ try
     builder.Services.AddTransient<ITripService, TripService>();
     builder.Services.AddTransient<IBusDriverSevice, BusDriverSevice>();
 
+    builder.Services.AddScoped<IAuthRepository, AuthRepository>();
     builder.Services.AddScoped<ISubscriptPlanRepo, SubscriptPlanRepo>();
     builder.Services.AddScoped<ISubscriptBenefitRepo, SubscriptBenefitRepo>();
     builder.Services.AddScoped<IUserSubscriptionRepo, UserSubscriptionRepo>();
 
-
-
     builder.Services.AddTransient<IOtpGenerator, OtpGenerator>();
 
 
-    var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? DefaultValues.JWT_SECRET_KEY);
-    var tokenValidationParams = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        RequireExpirationTime = true,
-        ClockSkew = TimeSpan.Zero
-    };
+    // var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? DefaultValues.JWT_SECRET_KEY);
+    // var tokenValidationParams = new TokenValidationParameters
+    // {
+    //     ValidateIssuerSigningKey = true,
+    //     IssuerSigningKey = new SymmetricSecurityKey(key),
+    //     ValidateIssuer = false,
+    //     ValidateAudience = false,
+    //     ValidateLifetime = true,
+    //     RequireExpirationTime = true,
+    //     ClockSkew = TimeSpan.Zero
+    // };
 
-    builder.Services.AddAuthentication(options =>
-    {
+    // builder.Services.AddAuthentication(options =>
+    // {
+    //     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    // })
+    // .AddJwtBearer(config =>
+    // {
+    //     config.RequireHttpsMetadata = false;
+    //     config.SaveToken = true;
+    //     config.TokenValidationParameters = tokenValidationParams;
+    // });
+
+    // builder.Services.Configure<JwtConfig>(builder.Environment.GetEnvironmentVariable("Key"));
+
+// builder.Services.AddIdentity<User, IdentityRole>()
+//             .AddEntityFrameworkStores<DataContext>()
+//             .AddDefaultUI()
+//             .AddDefaultTokenProviders();
+
+    builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+        .AddEntityFrameworkStores<AppDbContext>();
+
+    builder.Services.AddAuthentication(options => {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-    .AddJwtBearer(config =>
-    {
-        config.RequireHttpsMetadata = false;
-        config.SaveToken = true;
-        config.TokenValidationParameters = tokenValidationParams;
+    .AddJwtBearer(jwt => {
+        // var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("Key"));
+        var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("Key"));
+        jwt.SaveToken = true;
+        jwt.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            RequireExpirationTime = false,
+            ValidateLifetime = true
+        };
     });
 
     // builder.Services.AddAuthorization(options =>
@@ -191,14 +221,14 @@ try
 
 
     //Ensure all controllers use jwt token
-    builder.Services.AddControllers(options =>
-    {
-        var policy = new AuthorizationPolicyBuilder()
-            .RequireAuthenticatedUser()
-            .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-            .Build();
-        options.Filters.Add(new AuthorizeFilter(policy));
-    });
+    // builder.Services.AddControllers(options =>
+    // {
+    //     var policy = new AuthorizationPolicyBuilder()
+    //         .RequireAuthenticatedUser()
+    //         .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+    //         .Build();
+    //     options.Filters.Add(new AuthorizeFilter(policy));
+    // });
 
  
 

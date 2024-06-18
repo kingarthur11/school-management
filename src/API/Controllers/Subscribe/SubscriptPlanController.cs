@@ -21,12 +21,12 @@ namespace API.Controllers.Subscribe
             _subscriptPlanRepo = subscriptPlanRepo;
         }
         
-        [SwaggerOperation(
-              Summary = "Create a new Parent Endpoint",
-              Description = "This endpoint creates a new Parent. It requires Admin privilege",
-              OperationId = "parent.create",
-              Tags = new[] { "PersonaEndpoints" })
-        ]
+        // [SwaggerOperation(
+        //       Summary = "Create a new Parent Endpoint",
+        //       Description = "This endpoint creates a new Parent. It requires Admin privilege",
+        //       OperationId = "parent.create",
+        //       Tags = new[] { "PersonaEndpoints" })
+        // ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ApiResponse<List<SubscribePlanResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
@@ -41,14 +41,14 @@ namespace API.Controllers.Subscribe
             return HandleResult(response);
         }
 
-        [SwaggerOperation(
-              Summary = "Create a new Parent Endpoint",
-              Description = "This endpoint creates a new Parent. It requires Admin privilege",
-              OperationId = "parent.create",
-              Tags = new[] { "PersonaEndpoints" })
-        ]
+        // [SwaggerOperation(
+        //       Summary = "Create a new Parent Endpoint",
+        //       Description = "This endpoint creates a new Parent. It requires Admin privilege",
+        //       OperationId = "parent.create",
+        //       Tags = new[] { "PersonaEndpoints" })
+        // ]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(ApiResponse<List<SubscribePlanResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<SubscriptPlan>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
@@ -71,6 +71,13 @@ namespace API.Controllers.Subscribe
         //     }
         //     return Ok(result);
         // }
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ActionResult<SubscriptPlan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
         [HttpPost]
         // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<SubscriptPlan>> CreateSubscriptPlanAsync([FromBody] SubscriptPlan request)
