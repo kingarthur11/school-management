@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UserService.Models;
 
 namespace Core.Entities.Users
 {
-    public class Staff : BaseEntity
+    public class Staff : BaseEntity, ITenant
     {
         //UserId or PersonaId
         public Guid PersonaId { get; set; }
@@ -22,7 +23,7 @@ namespace Core.Entities.Users
         public JobTitle? JobTitle { get; set; }
         public Guid? DepartmentId { get; set; }
         public Department? Department { get; set; }
-
+        public string? TenantId { get; set; }
         public void Delete(string deletor)
         {
             IsDeleted = true;

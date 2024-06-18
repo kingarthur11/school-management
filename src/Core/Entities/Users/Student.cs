@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UserService.Models;
 
 namespace Core.Entities.Users
 {
-    public class Student : BaseEntity
+    public class Student : BaseEntity, ITenant
     {
         //UserId or PersonaId
         public Guid PersonaId { get; set; }
@@ -57,7 +58,7 @@ namespace Core.Entities.Users
         public List<Parent>? Parents { get; set; }
 
         public ICollection<TripStudent> TripStudents { get; set; } = new List<TripStudent>();
-
+        public string? TenantId { get; set; }
         public void Delete(string deletor)
         {
             IsDeleted = true;
