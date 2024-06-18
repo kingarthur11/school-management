@@ -14,15 +14,15 @@ namespace Core.Interfaces.Repositories
     public class UserSubscriptionRepo : IUserSubscriptionRepo
     {
         private readonly AppDbContext _dbContext;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        // private readonly IHttpContextAccessor _httpContextAccessor;
         // private readonly UserManager<User> _userManager;
         public UserSubscriptionRepo(
-            IHttpContextAccessor httpContextAccessor, 
+            // IHttpContextAccessor httpContextAccessor, 
             // UserManager<User> userManager,
             AppDbContext dataContex)
         {
             _dbContext = dataContex;
-            _httpContextAccessor = httpContextAccessor;
+            // _httpContextAccessor = httpContextAccessor;
             // _userManager = userManager;
         }
         // public async Task<UserSubscript> ShowUserSubscriptAsync()

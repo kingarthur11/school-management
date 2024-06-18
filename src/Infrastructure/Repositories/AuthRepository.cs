@@ -10,56 +10,109 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
+using UserService.Models.ResponseBody;
 
 namespace Infrastructure.Repositories
 {
     public class AuthRepository : IAuthRepository
     {
         private readonly UserManager<User> _userManager;
-        private readonly IConfiguration _configuration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        // private readonly IConfiguration _configuration;
+        // private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppDbContext _dbContext;
         public AuthRepository(
-            IHttpContextAccessor httpContextAccessor,
+            // IHttpContextAccessor httpContextAccessor,
             UserManager<User> userManager,
-            IConfiguration configuration,
+            // IConfiguration configuration,
             AppDbContext dataContex
             )
         {
-            _httpContextAccessor = httpContextAccessor;
-            _configuration = configuration;
+            // _httpContextAccessor = httpContextAccessor;
+            // _configuration = configuration;
             _userManager = userManager;
             _dbContext = dataContex;
         }
-        public async Task<ActionResult<IEnumerable<User>>> GetAllUsersAsync()
+        public async Task<ApiResponse<List<UserResponse>>> GetAllUsersAsync()
         {
-            return await _userManager.Users.ToListAsync();
+            var response = new ApiResponse<List<UserResponse>>();
+            var students =  _userManager.Users
+                .Select(user => new UserResponse()
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                })
+                .AsNoTracking();
+
+            response.Data = await students.ToListAsync();
+            return response;
+            // return await _userManager.Users.ToListAsync();
         }
-        public async Task<ActionResult<User>> ShowUserByIdAsync(string Id)
+        public async Task<ApiResponse<UserResponse>> ShowUserByIdAsync(Guid Id)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Id == Id);
-            return user;
+            var result = await _userManager.Users.FirstOrDefaultAsync(user => user.Id == Id);
+            if (result == null)
+            {
+                return new ApiResponse<UserResponse>()
+                {
+                    Data = null,
+                    Message = "Subscription plan not found"
+                };
+            }
+            return new ApiResponse<UserResponse>()
+            {
+                Data = new UserResponse()
+                {
+                     Id = result.Id,
+                    FirstName = result.FirstName,
+                    LastName = result.LastName,
+                    Email = result.Email,
+                }
+            };
+            // var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Id == Id);
+            // return user;
         }
        
-        public async Task<ActionResult<User>> ShowUserByEmailAsync(string email)
+        public async Task<ApiResponse<UserResponse>> ShowUserByEmailAsync(string email)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == email);
-            return user;
+            var result = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == email);
+            if (result == null)
+            {
+                return new ApiResponse<UserResponse>()
+                {
+                    Data = null,
+                    Message = "Subscription plan not found"
+                };
+            }
+            return new ApiResponse<UserResponse>()
+            {
+                Data = new UserResponse()
+                {
+                     Id = result.Id,
+                    FirstName = result.FirstName,
+                    LastName = result.LastName,
+                    Email = result.Email,
+                }
+            };
+            // var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == email);
+            // return user;
         }
 
-        public async Task<ActionResult<AuthenticateResponse>> RegisterUserAsync(CreateUserDTO request)
+        public async Task<ApiResponse<AuthenticateResponse>> RegisterUserAsync(CreateUserDTO request)
         {
             if (request == null)
             {
                throw new NotFoundException($"Request body cannot be empty.");
             }
-            var newTenant = new Tenant()
-            {
-                Id = request.SchoolAlias,
-                Name = request.SchoolAlias,
-                TenantAdminEmail = request.Email
-            };
+            // var newTenant = new Tenant()
+            // {
+            //     Id = request.SchoolAlias,
+            //     Name = request.SchoolAlias,
+            //     TenantAdminEmail = request.Email
+            // };
 
             var newUser = new User() 
             {
@@ -101,19 +154,31 @@ namespace Infrastructure.Repositories
                throw new BadRequestException($"User school alias already exist.");
             }
             
-            var tenantResult = await _dbContext.Tenants.AddAsync(newTenant);
+            // var tenantResult = await _dbContext.Tenants.AddAsync(newTenant);
             await _dbContext.SaveChangesAsync();
 
-            var newTenantId = tenantResult.Entity.Id;
-            newUser.TenantId = newTenantId;
+            // var newTenantId = tenantResult.Entity.Id;
+            // newUser.TenantId = newTenantId;
 
             var result = await _userManager.CreateAsync(newUser, request.Password);
+            var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == request.Email);
             
-            var token = GenerateNewJwtToken(newUser, request.SchoolAlias);
-            return new AuthenticateResponse(newUser, token);
+            var token = GenerateNewJwtToken(newUser);
+            return new ApiResponse<AuthenticateResponse>()
+            {
+                Data = new AuthenticateResponse()
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Token = token
+                }
+            };
+            // return new AuthenticateResponse(newUser, token);
             
         }
-        public async Task<AuthenticateResponse?> Login(AuthenticateRequest request)
+        public async Task<ApiResponse<AuthenticateResponse>> Login(AuthenticateRequest request)
         {
             if (request == null)
             {
@@ -127,21 +192,33 @@ namespace Infrastructure.Repositories
                throw new BadRequestException($"User password mismatch.");
             }
             // var token = GenerateJwtToken(userByEmail);
-            var token = GenerateNewJwtToken(userByEmail, userByEmail.UserName);
+            var token = GenerateNewJwtToken(userByEmail);
+            return new ApiResponse<AuthenticateResponse>()
+            {
+                Data = new AuthenticateResponse()
+                {
+                    Id = userByEmail.Id,
+                    FirstName = userByEmail.FirstName,
+                    LastName = userByEmail.LastName,
+                    Email = userByEmail.Email,
+                    Token = token
+                }
+            };
             // throw new BadRequestException(userByEmail.UserName);
-            return new AuthenticateResponse(userByEmail, token);
+            // return new AuthenticateResponse(userByEmail, token);
         }
 
-        private string GenerateNewJwtToken(User user, string tenantId)
+        private string GenerateNewJwtToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+            var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Key"));
+            // var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(new[] 
                 { 
-                    new Claim("id", user.Id),
-                    new Claim("TenantId", tenantId),
+                    new Claim("email", user.Email),
+                    // new Claim("TenantId", tenantId),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? ""),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -154,61 +231,28 @@ namespace Infrastructure.Repositories
             var token = jwtTokenHandler.CreateToken(tokenDescriptor);
             var jwtToken = jwtTokenHandler.WriteToken(token);
             return jwtToken;
-            // var tokenHandler = new JwtSecurityTokenHandler();
-            // var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            // var tokenDescriptor = new SecurityTokenDescriptor
-            // {
-            //     Subject = new ClaimsIdentity(new[] 
-            //     { 
-            //         new("id", user.Id),
-            //         new Claim("TenantId", tenantId),
-            //     }),
-            //     Expires = DateTime.UtcNow.AddDays(7),
-            //     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            // };
-            // var token = tokenHandler.CreateToken(tokenDescriptor);
-            // return tokenHandler.WriteToken(token);
-
-
-            // var claims = new List<Claim>
-            // {
-            //     new("id", user.Id),
-            //     new("TenantId", tenantId),
-            //     new(JwtRegisteredClaimNames.Sub, user.Email ?? ""),
-            //     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            //     new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
-            // };
-            // var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            // var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            // var token = new JwtSecurityToken(
-            //     issuer: _configuration["Jwt:Issuer"],
-            //     audience: _configuration["Jwt:Audience"],
-            //     claims: claims,
-            //     expires: DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["Jwt:ExpireDays"])),
-            //     signingCredentials: creds
-            // );
-            // return new JwtSecurityTokenHandler().WriteToken(token);
+            
         }
 
-        private string GenerateJwtToken(User user)
-        {
-            var claims = new List<Claim>
-            {
-                new("id", user.Id),
-                new(JwtRegisteredClaimNames.Sub, user.Email ?? ""),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
-            };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["Jwt:ExpireDays"])),
-                signingCredentials: creds
-            );
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+        // private string GenerateJwtToken(User user)
+        // {
+        //     var claims = new List<Claim>
+        //     {
+        //         new("id", user.Id),
+        //         new(JwtRegisteredClaimNames.Sub, user.Email ?? ""),
+        //         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        //         new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+        //     };
+        //     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        //     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        //     var token = new JwtSecurityToken(
+        //         issuer: _configuration["Jwt:Issuer"],
+        //         audience: _configuration["Jwt:Audience"],
+        //         claims: claims,
+        //         expires: DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["Jwt:ExpireDays"])),
+        //         signingCredentials: creds
+        //     );
+        //     return new JwtSecurityTokenHandler().WriteToken(token);
+        // }
     }
 }

@@ -32,7 +32,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
+        // [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
         [SwaggerOperation(
             Summary = "Generate a new QrCode By Parent Endpoint",
             Description = "This endpoint generates a new data for qrCode. For AuthorizedUser :- Self = 0, Other = 1. It requires Parent privilege",
@@ -56,7 +56,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
+        // [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
         [SwaggerOperation(
         Summary = "Authorizes a QrCode By Parent Endpoint",
         Description = "This endpoint authorizes a qrCode. For AuthorizedUser :- Self = 0, Other = 1. It requires Parent privilege",
@@ -78,7 +78,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.STAFF + ", " + AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        // [Authorize(Roles = AuthConstants.Roles.STAFF + ", " + AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
         [SwaggerOperation(
         Summary = "Scan QrCode Of A Student Endpoint",
         Description = "This endpoint scans a qrCode of a student. It requires Staff or Admin privilege",
@@ -99,7 +99,7 @@ namespace API.Controllers.SPE
             return HandleResult(response);
         }
 
-        [Authorize(Roles = AuthConstants.Roles.STAFF + ", " + AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        // [Authorize(Roles = AuthConstants.Roles.STAFF + ", " + AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
         [SwaggerOperation(
         Summary = "Scan QrCode Of A BusDriver Endpoint",
         Description = "This endpoint scans a qrCode of a busdriver. It requires Staff or Admin privilege",
@@ -121,7 +121,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
+        // [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
         [SwaggerOperation(
          Summary = "Get List Of Students And QrCode Status For the Day For A Parent Dashboard Endpoint",
          Description = "It requires Parent privilege",
@@ -143,7 +143,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        // [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
         [SwaggerOperation(
         Summary = "Create a new trip Endpoint",
         Description = "Requires Bus Driver or Super Admin privileges. For TripType :- PickUp = 0, DropOff = 1. ",
@@ -165,7 +165,7 @@ namespace API.Controllers.SPE
         }
 
         
-        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        // [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER + ", " + AuthConstants.Roles.SUPER_ADMIN)]
         [SwaggerOperation(
         Summary = "Gets the list of Endpoint",
         Description = "Requires Bus Driver or Admin privileges",
@@ -188,7 +188,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        // [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
         [SwaggerOperation(
         Summary = "Add A Student To A Trip Endpoint.",
         Description = "Requires Bus Driver privileges",
@@ -208,7 +208,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        // [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
         [SwaggerOperation(
         Summary = "Remove a student from a trip Endpoint",
         Description = "Requires Bus Driver privileges",
@@ -228,7 +228,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        // [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
         [SwaggerOperation(
         Summary = "Gets the list of students not onboarded for a specific trip",
         Description = "Requires Bus Driver privileges",
@@ -248,7 +248,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        // [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
         [SwaggerOperation(
         Summary = "Gets the list of students onboarded for a specific trip",
         Description = "Requires Bus Driver privileges",
@@ -289,7 +289,7 @@ namespace API.Controllers.SPE
         //    return HandleResult(response);
         //}
         
-        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        // [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
         [SwaggerOperation(
             Summary = "Generate QrCode For Bus driver For A Trip Endpoint",
             Description = "It requires Bus Driver privilege",

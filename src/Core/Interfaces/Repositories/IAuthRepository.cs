@@ -14,14 +14,14 @@ namespace Core.Interfaces.Repositories
 {
     public interface IAuthRepository
     {
-        Task<ActionResult<IEnumerable<User>>> GetAllUsersAsync();
+        Task<ApiResponse<List<UserResponse>>> GetAllUsersAsync();
         // Task<bool> UserExists(string email);
-        Task<ActionResult<User>> ShowUserByIdAsync(string id);
+        Task<ApiResponse<UserResponse>> ShowUserByIdAsync(Guid id);
         // Task<ActionResult<Tenant>> ShowTenantBySchoolAliasAsync(string schoolAlias);
-        Task<ActionResult<User>> ShowUserByEmailAsync(string email);
-        Task<ActionResult<AuthenticateResponse>> RegisterUserAsync(CreateUserDTO user);
-        Task<AuthenticateResponse?> Login(AuthenticateRequest model);
+        Task<ApiResponse<UserResponse>> ShowUserByEmailAsync(string email);
+        Task<ApiResponse<AuthenticateResponse>> RegisterUserAsync(CreateUserDTO user);
+        Task<ApiResponse<AuthenticateResponse>> Login(AuthenticateRequest model);
 
-        // Task<ActionResult<User>> TestUserAsyn(AuthenticateRequest model);
+        // Task<ApiResponse<UserResponse>> TestUserAsyn(AuthenticateRequest model);
     }
 }
