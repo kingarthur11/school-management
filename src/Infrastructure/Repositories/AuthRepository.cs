@@ -200,7 +200,7 @@ namespace Infrastructure.Repositories
                throw new BadRequestException($"User password mismatch.");
             }
             // var result = await _dbContext.SubscriptPlans.FirstOrDefaultAsync(subscription => subscription.Id == id);
-            var token = GenerateNewJwtToken(userByEmail, userByEmail.Entity.Id);
+            var token = GenerateNewJwtToken(userByEmail, userByEmail.TenantId);
             return new ApiResponse<AuthenticateResponse>()
             {
                 Data = new AuthenticateResponse()
@@ -225,9 +225,9 @@ namespace Infrastructure.Repositories
             {
                 Subject = new ClaimsIdentity(new[] 
                 { 
-                    new Claim("id", user.Id),
+                    // new Claim("id", user.Id),
                     new Claim("email", user.Email),
-                    new Claim("TenantId", tenantId),
+                    new Claim("TenantId", newTenantId),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? ""),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
