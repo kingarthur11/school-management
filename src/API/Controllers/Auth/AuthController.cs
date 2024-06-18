@@ -10,6 +10,7 @@ using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 using UserService.Models.ResponseBody;
 using System.Security.Claims;
+using API.Controllers.SPE;
 
 namespace API.Controllers.Auth
 {
@@ -30,17 +31,28 @@ namespace API.Controllers.Auth
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetEmailClaim()
         {
-            var emailClaim = User.FindFirst(ClaimTypes.Email);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
 
-            if (emailClaim != null)
+            if (tenantIdClaim != null)
             {
-                var email = emailClaim.Value;
-                return Ok(new { Email = email });
+                var tenantId = tenantIdClaim.Value;
+                return Ok(new { TenantId = tenantId });
             }
             else
             {
-                return NotFound("Email claim not found for the user");
+                return NotFound("TenantId claim not found for the user");
             }
+            // var emailClaim = User.FindFirst(ClaimTypes.Email);
+            // Console.WriteLine("email", emailClaim);
+            // if (emailClaim != null)
+            // {
+            //     var email = emailClaim.Value;
+            //     return Ok(new { Email = email });
+            // }
+            // else
+            // {
+            //     return NotFound("Email claim not found for the user");
+            // }
         }
         // [HttpGet("jwt")]
         // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
