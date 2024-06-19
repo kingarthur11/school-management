@@ -96,7 +96,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PersonaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PersonaId = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
@@ -165,7 +165,7 @@ namespace Infrastructure.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<string>(type: "text", nullable: false),
                     StudentEnrollment = table.Column<string>(type: "text", nullable: false),
-                    PersonaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PersonaId = table.Column<string>(type: "text", nullable: false),
                     AdminType = table.Column<int>(type: "integer", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedBy = table.Column<string>(type: "text", nullable: true),
@@ -257,7 +257,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PersonaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PersonaId = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     PhotoUrl = table.Column<string>(type: "text", nullable: true),
@@ -316,7 +316,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PersonaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PersonaId = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     PhotoUrl = table.Column<string>(type: "text", nullable: true),
@@ -454,7 +454,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PersonaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PersonaId = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     PhotoUrl = table.Column<string>(type: "text", nullable: true),
@@ -575,7 +575,7 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     SubscriptPlanId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PersonaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PersonaId = table.Column<string>(type: "text", nullable: false),
                     AdminType = table.Column<int>(type: "integer", nullable: false),
                     TenantId = table.Column<string>(type: "text", nullable: true),
                     UserId = table.Column<string>(type: "text", nullable: false),

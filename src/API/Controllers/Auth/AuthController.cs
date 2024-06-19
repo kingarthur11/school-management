@@ -27,33 +27,33 @@ namespace API.Controllers.Auth
             // _httpContextAccessor = httpContextAccessor;
             _authRepository = usersRepository;
         }
-        [HttpGet("email")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult GetEmailClaim()
-        {
-            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+        // [HttpGet("email")]
+        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        // public IActionResult GetEmailClaim()
+        // {
+        //     var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
 
-            if (tenantIdClaim != null)
-            {
-                var tenantId = tenantIdClaim.Value;
-                return Ok(new { TenantId = tenantId });
-            }
-            else
-            {
-                return NotFound("TenantId claim not found for the user");
-            }
-            // var emailClaim = User.FindFirst(ClaimTypes.Email);
-            // Console.WriteLine("email", emailClaim);
-            // if (emailClaim != null)
-            // {
-            //     var email = emailClaim.Value;
-            //     return Ok(new { Email = email });
-            // }
-            // else
-            // {
-            //     return NotFound("Email claim not found for the user");
-            // }
-        }
+        //     if (tenantIdClaim != null)
+        //     {
+        //         var tenantId = tenantIdClaim.Value;
+        //         return Ok(new { TenantId = tenantId });
+        //     }
+        //     else
+        //     {
+        //         return NotFound("TenantId claim not found for the user");
+        //     }
+        //     // var emailClaim = User.FindFirst(ClaimTypes.Email);
+        //     // Console.WriteLine("email", emailClaim);
+        //     // if (emailClaim != null)
+        //     // {
+        //     //     var email = emailClaim.Value;
+        //     //     return Ok(new { Email = email });
+        //     // }
+        //     // else
+        //     // {
+        //     //     return NotFound("Email claim not found for the user");
+        //     // }
+        // }
         // [HttpGet("jwt")]
         // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         // public async Task<ActionResult> Get()
@@ -98,19 +98,8 @@ namespace API.Controllers.Auth
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
         [HttpGet("user_id/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<ApiResponse<UserResponse>>> Show(Guid id)
+        public async Task<ActionResult<ApiResponse<UserResponse>>> Show(string id)
         {
-            // var jwtIdClaim = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti);
-            // if (jwtIdClaim != null)
-            // {
-            //     var jwtId = jwtIdClaim.Value;
-            //     return Ok(new { JwtId = jwtId });
-            // }
-            // else
-            // {
-            //     // Handle case where "jti" claim is not found
-            //     return NotFound();
-            // }
             var response = await _authRepository.ShowUserByIdAsync(id);
             return HandleResult(response);
             

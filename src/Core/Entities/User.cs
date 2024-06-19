@@ -11,7 +11,7 @@ namespace Core.Entities
 {
     public class User : IdentityUser, ITenant
     {
-        public Guid Id { get; set; }
+        // public Guid Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
@@ -40,7 +40,7 @@ namespace Core.Entities
         {
             Created = created;
             IsDeleted = isDeleted;
-            Id = Guid.NewGuid();
+            // Id = Guid.NewGuid();
         }
         public User() : this(DateTime.UtcNow, false) { }
 

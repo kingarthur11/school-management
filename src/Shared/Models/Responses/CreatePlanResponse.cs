@@ -6,9 +6,8 @@ using Shared.Enums;
 
 namespace Shared.Models.Responses
 {
-    public class SubscribePlanResponse
+    public class CreatePlanResponse
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Price { get; set; }
         public string StudentEnrollment { get; set; }
