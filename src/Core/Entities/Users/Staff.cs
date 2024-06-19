@@ -10,7 +10,7 @@ namespace Core.Entities.Users
     public class Staff : BaseEntity, ITenant
     {
         //UserId or PersonaId
-        public Guid PersonaId { get; set; }
+        public string PersonaId { get; set; }
 
         public string LastName { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;

@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shared.Enums;
 
-namespace Shared.Models.Responses
+namespace Shared.Models.Requests
 {
-    public class SubscribePlanResponse
+    public class CreateSubPlan
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Price { get; set; }
         public string StudentEnrollment { get; set; }

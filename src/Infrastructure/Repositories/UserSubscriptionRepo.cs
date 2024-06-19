@@ -15,20 +15,19 @@ namespace Core.Interfaces.Repositories
     {
         private readonly AppDbContext _dbContext;
         // private readonly IHttpContextAccessor _httpContextAccessor;
-        // private readonly UserManager<User> _userManager;
+        private readonly UserManager<User> _userManager;
         public UserSubscriptionRepo(
             // IHttpContextAccessor httpContextAccessor, 
-            // UserManager<User> userManager,
+            UserManager<User> userManager,
             AppDbContext dataContex)
         {
             _dbContext = dataContex;
             // _httpContextAccessor = httpContextAccessor;
-            // _userManager = userManager;
+            _userManager = userManager;
         }
-        // public async Task<UserSubscript> ShowUserSubscriptAsync()
+        // public async Task<UserSubscript> ShowUserSubscriptBySubIdAsync(string tenantId, string email)
         // {
-        //     var userEmail =  _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier); 
-        //     var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == userEmail);
+        //     var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == email);
         //     return await _dbContext.UserSubscripts.FirstOrDefaultAsync(subscription => subscription.UserId == user.Id);
         // }
 
@@ -55,18 +54,26 @@ namespace Core.Interfaces.Repositories
             return await _dbContext.UserSubscripts.ToListAsync();
         }
         // // public async Task<UserSubscript> AddUserSubscript(SubscribeRequest request)
-        public async Task<BaseResponse> AddUserSubscript(SubscribeRequest request)
+        public async Task<BaseResponse> AddUserSubscript(SubscribeRequest request, string tenantId, string email)
         {
             var subPlan = await _dbContext.SubscriptPlans.FirstOrDefaultAsync(sub => sub.Id == request.SubscriptPlanId);
             var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
-
-            UserSubscript plan = new();
-            if (plan == null)
+            if (subPlan is null)
             {
-                plan.SubscriptPlanId = request.SubscriptPlanId;
-                plan.PersonaId = Guid.NewGuid();
-                plan.SubscriptPlan = subPlan;
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Status = false;
+                response.Message = "Subsription plan not found";
+                return response;
             }
+            var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == email);
+
+            var plan = new UserSubscript()
+            {
+                SubscriptPlanId = request.SubscriptPlanId,
+                PersonaId = user.Id,
+                SubscriptPlan = subPlan,
+                TenantId = tenantId,
+            };
             await _dbContext.UserSubscripts.AddAsync(plan);
             var result = await _dbContext.TrySaveChangesAsync();
             if (result)
@@ -74,48 +81,12 @@ namespace Core.Interfaces.Repositories
                 return response;
             }
 
-            response.Message = "Unable to add student to the trip! Please try again";
+            response.Message = "Unable to create user subscription! Please try again";
             response.Status = false;
             response.Code = ResponseCodes.Status500InternalServerError;
 
             return response;
         }
-        
-        // public async Task<UserSubscript> AddUserSubscript(SubscribeRequest request)
-        // {
-        //     var subPlan = await _dbContext.SubscriptPlans.FirstOrDefaultAsync(sub => sub.Id == request.SubscriptPlanId);
-        //     if (subPlan == null)
-        //     {
-        //         throw new NotFoundException($"Subscription plan not found.");
-        //     }
-            
-        //     var userEmail = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier); 
-        //     var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == userEmail);
-        //     if (user == null)
-        //     {
-        //         throw new NotFoundException($"User not found.");
-        //     }
-            
-        //     var existingUserSubscript = await _dbContext.UserSubscripts.FirstOrDefaultAsync(us => us.UserId == user.Id && us.SubscriptPlanId == request.SubscriptPlanId);
-        //     if (existingUserSubscript != null)
-        //     {
-        //         throw new BadRequestException($"User already subscribe to this plan.");
-        //     }
-            
-        //     UserSubscript plan = new()
-        //     {
-        //         SubscriptPlanId = request.SubscriptPlanId,
-        //         UserId = user.Id,
-        //         SubscriptPlan = subPlan,
-        //         User = user
-        //     };
-            
-        //     var result = await _dbContext.UserSubscripts.AddAsync(plan);
-        //     await _dbContext.SaveChangesAsync();
-            
-        //     return result.Entity;
-        // }
-
 
         // public async Task<UserSubscript> UpdateUserSubscript(UserSubscript request, List<int> subscriptBenefitIds)
         // {

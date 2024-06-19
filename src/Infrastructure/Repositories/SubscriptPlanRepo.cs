@@ -2,6 +2,8 @@ using Core.Entities;
 using Core.Interfaces.Repositories;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 using static Shared.Constants.StringConstants;
 
@@ -10,9 +12,14 @@ namespace Infrastructure.Repositories
     public class SubscriptPlanRepo : ISubscriptPlanRepo
     {
         private readonly AppDbContext _dbContext;
-        public SubscriptPlanRepo(AppDbContext dataContex)
+        private readonly ILogger<SubscriptPlanRepo> _logger;
+        public SubscriptPlanRepo(
+            ILogger<SubscriptPlanRepo> logger,
+            AppDbContext dataContex
+            )
         {
             _dbContext = dataContex;
+            _logger = logger;
         }
         public async Task<ApiResponse<SubscribePlanResponse>> ShowSubscriptPlanAsync(Guid id)
         {
@@ -71,11 +78,21 @@ namespace Infrastructure.Repositories
 
             return response;
         }
-        public async Task<BaseResponse> AddSubscriptPlan(SubscriptPlan request)
+        public async Task<BaseResponse> AddSubscriptPlan(CreateSubPlan request)
         {
             var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
+            var plan = new SubscriptPlan()
+            {
+                Name = request.Name,
+                Price = request.Price,
+                StudentEnrollment = request.StudentEnrollment,
+                AdminType = request.AdminType,
+            };
 
-            await _dbContext.SubscriptPlans.AddAsync(request);
+            _logger.LogInformation("Creating a new tenant with name: {0}", plan.AdminType);
+            _logger.LogInformation("Creating a new tenant with name: {0}", request.AdminType);
+
+            await _dbContext.SubscriptPlans.AddAsync(plan);
 
             var result = await _dbContext.TrySaveChangesAsync();
             if (result)
@@ -83,7 +100,7 @@ namespace Infrastructure.Repositories
                 return response;
             }
 
-            response.Message = "Unable to add student to the trip! Please try again";
+            response.Message = "Unable to create subscription plan! Please try again";
             response.Status = false;
             response.Code = ResponseCodes.Status500InternalServerError;
 
