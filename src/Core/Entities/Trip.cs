@@ -6,13 +6,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UserService.Models;
 
 namespace Core.Entities
 {
-    public class Trip : BaseEntity
+    public class Trip : BaseEntity, ITenant
     {
         [StringLength(100)]
         public string BusDriver { get; set; } = string.Empty;
+        public string TenantId { get; set; } = string.Empty;
 
         [StringLength(100)]
         public string FuelCousumption { get; set; } = string.Empty;

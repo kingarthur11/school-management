@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UserService.Models;
 
 namespace Core.Entities
 {
-    public class TripStudent : BaseEntity
+    public class TripStudent : BaseEntity, ITenant
     {
         public Guid TripId { get; set; }
+        public string TenantId { get; set; }
         public Trip Trip { get; set; }
 
         public Guid StudentId { get; set; }

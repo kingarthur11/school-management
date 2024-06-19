@@ -1,15 +1,17 @@
 ﻿using Core.Entities.Users;
 using Shared.Enums;
+using UserService.Models;
 
 namespace Core.Entities
 {
-    public class QrCode : BaseEntity
+    public class QrCode : BaseEntity, ITenant
     {
         /// <summary>
         /// Parent-Id or BusDriver-Id or Staff-Id
         /// </summary>
         //public Guid UserId { get; set; }
         public string UserEmail { get; set; }
+        public string? TenantId { get; set; }
         public Guid? StudentId { get; set; }
         public Student? Student { get; set; }
         public bool InSchool { get; set; } = true;
