@@ -84,7 +84,7 @@ namespace Core.Services
             _logger.LogInformation("Photo uploaded sucessfuly");
 
             var user = new User() { 
-                Id = Guid.NewGuid(),
+                // Id = Guid.NewGuid(),
                 UserName = request.Email, 
                 Email = request.Email, 
                 PhoneNumber = request.PhoneNumber, 
@@ -231,7 +231,7 @@ namespace Core.Services
             {
                 emailExist = string.Concat(request.FirstName, request.LastName,$"{sameEmailCount++}","@","smsabuja", ".com");
                 user = new User() { 
-                    Id = Guid.NewGuid() ,
+                    // Id = Guid.NewGuid() ,
                     UserName = string.Concat(request.FirstName, request.LastName), 
                     Email = emailExist, 
                     PhoneNumber = parent.PhoneNumber, 
@@ -246,7 +246,7 @@ namespace Core.Services
             else
             {
                 user = new User() { 
-                    Id = Guid.NewGuid() ,
+                    // Id = Guid.NewGuid() ,
                     UserName = string.Concat(request.FirstName,  request.LastName),
                      Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"),
                     PhoneNumber = parent.PhoneNumber, 
@@ -343,15 +343,15 @@ namespace Core.Services
 
             _logger.LogInformation("Student Creation is successful");
 
-            var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STUDENT);
-            if (!roleResult.Succeeded)
-            {
-                _logger.LogInformation("Unable add user to Student role.");
-                response.Status = false;
-                response.Message = "Unable add user to Student role.";
-                response.Code = ResponseCodes.Status500InternalServerError;
-                return response;
-            }
+            // var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STUDENT);
+            // if (!roleResult.Succeeded)
+            // {
+            //     _logger.LogInformation("Unable add user to Student role.");
+            //     response.Status = false;
+            //     response.Message = "Unable add user to Student role.";
+            //     response.Code = ResponseCodes.Status500InternalServerError;
+            //     return response;
+            // }
 
             var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
             // _ = _mediator.Publish(new NewStudentCreatedEvent(personaResponse, request.Password, parent.FullName, parent.Email));
@@ -453,7 +453,7 @@ namespace Core.Services
 
             var user = new User() 
             { 
-                Id = Guid.NewGuid(),
+                // Id = Guid.NewGuid(),
                 UserName = request.Email, 
                 Email = request.Email, 
                 PhoneNumber = request.PhoneNumber, 
@@ -499,15 +499,15 @@ namespace Core.Services
             _logger.LogInformation("Bus driver Creation is successful");
 
 
-            var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.BUS_DRIVER);
-            if (!roleResult.Succeeded)
-            {
-                _logger.LogInformation("Unable add user to Bus driver role.");
-                response.Message = "Unable add user to Bus driver role.";
-                response.Code = ResponseCodes.Status500InternalServerError;
-                response.Status = false;
-                return response;
-            }
+            // var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.BUS_DRIVER);
+            // if (!roleResult.Succeeded)
+            // {
+            //     _logger.LogInformation("Unable add user to Bus driver role.");
+            //     response.Message = "Unable add user to Bus driver role.";
+            //     response.Code = ResponseCodes.Status500InternalServerError;
+            //     response.Status = false;
+            //     return response;
+            // }
 
             var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
             // _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
@@ -544,7 +544,7 @@ namespace Core.Services
 
             var user = new User() 
             { 
-                Id = Guid.NewGuid(),
+                // Id = Guid.NewGuid(),
                 UserName = request.Email, 
                 Email = request.Email, 
                 PhoneNumber = request.PhoneNumber, 
@@ -588,15 +588,15 @@ namespace Core.Services
             }
             _logger.LogInformation("Staff Creation is successful");
 
-            var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STAFF);
-            if (!roleResult.Succeeded)
-            {
-                _logger.LogInformation("Unable add user to Staff role.");
-                response.Message = "Unable add user to Staff role.";
-                response.Code = ResponseCodes.Status500InternalServerError;
-                response.Status = false;
-                return response;
-            }
+            // var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STAFF);
+            // if (!roleResult.Succeeded)
+            // {
+            //     _logger.LogInformation("Unable add user to Staff role.");
+            //     response.Message = "Unable add user to Staff role.";
+            //     response.Code = ResponseCodes.Status500InternalServerError;
+            //     response.Status = false;
+            //     return response;
+            // }
 
 
             var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };

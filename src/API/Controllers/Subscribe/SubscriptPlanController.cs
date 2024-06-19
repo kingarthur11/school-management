@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Controllers;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -72,20 +73,22 @@ namespace API.Controllers.Subscribe
         //     return Ok(result);
         // }
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(ActionResult<SubscriptPlan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<BaseResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
         [HttpPost]
-        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<SubscriptPlan>> CreateSubscriptPlanAsync([FromBody] SubscriptPlan request)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<BaseResponse>> CreateSubscriptPlanAsync([FromBody] CreateSubPlan request)
         {
-            if (request == null)
-                return BadRequest("");
-            var createSub = await _subscriptPlanRepo.AddSubscriptPlan(request);
-            return CreatedAtAction(nameof(Show), new { id = request.Id }, createSub);
+            var response = await _subscriptPlanRepo.AddSubscriptPlan(request);
+            return HandleResult(response);
+            // if (request == null)
+            //     return BadRequest("");
+            // var createSub = await _subscriptPlanRepo.AddSubscriptPlan(request);
+            // return CreatedAtAction(nameof(Show), new { id = request.Id }, createSub);
         }
         // [HttpPut]
         // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

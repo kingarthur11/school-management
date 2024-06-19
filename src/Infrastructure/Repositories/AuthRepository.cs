@@ -45,7 +45,7 @@ namespace Infrastructure.Repositories
         public async Task<ApiResponse<List<UserResponse>>> GetAllUsersAsync()
         {
             var response = new ApiResponse<List<UserResponse>>();
-            var students =  _userManager.Users
+            var result =  _userManager.Users
                 .Select(user => new UserResponse()
                 {
                     Id = user.Id,
@@ -55,26 +55,27 @@ namespace Infrastructure.Repositories
                 })
                 .AsNoTracking();
 
-            response.Data = await students.ToListAsync();
+            response.Data = await result.ToListAsync();
             return response;
             // return await _userManager.Users.ToListAsync();
         }
-        public async Task<ApiResponse<UserResponse>> ShowUserByIdAsync(Guid Id)
+        public async Task<ApiResponse<UserResponse>> ShowUserByIdAsync(string Id)
         {
-            var result = await _userManager.Users.FirstOrDefaultAsync(user => user.Id == Id);
+            var result = await _userManager.FindByIdAsync(Id);
+            // var result = await _userManager.Users.FirstOrDefaultAsync(user => user.Id == Id);
             if (result == null)
             {
                 return new ApiResponse<UserResponse>()
                 {
                     Data = null,
-                    Message = "Subscription plan not found"
+                    Message = "User Id not found"
                 };
             }
             return new ApiResponse<UserResponse>()
             {
                 Data = new UserResponse()
                 {
-                     Id = result.Id,
+                    Id = result.Id,
                     FirstName = result.FirstName,
                     LastName = result.LastName,
                     Email = result.Email,
@@ -92,14 +93,14 @@ namespace Infrastructure.Repositories
                 return new ApiResponse<UserResponse>()
                 {
                     Data = null,
-                    Message = "Subscription plan not found"
+                    Message = "User email not found"
                 };
             }
             return new ApiResponse<UserResponse>()
             {
                 Data = new UserResponse()
                 {
-                     Id = result.Id,
+                    Id = result.Id,
                     FirstName = result.FirstName,
                     LastName = result.LastName,
                     Email = result.Email,
@@ -124,6 +125,7 @@ namespace Infrastructure.Repositories
 
             var newUser = new User() 
             {
+                // Id = Guid.NewGuid(),
                 Email = request.Email,
                 UserName = request.SchoolAlias,
                 TenantId = request.SchoolAlias,

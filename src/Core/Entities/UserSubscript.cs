@@ -15,7 +15,7 @@ namespace Core.Entities
         // public int Id { get; set; }
         public Guid SubscriptPlanId { get; set; }
         public SubscriptPlan SubscriptPlan { get; set; } = null!;
-        public Guid PersonaId { get; set; }
+        public string PersonaId { get; set; }
         public AdminType AdminType { get; set; }
         public string? TenantId { get; set; }
         public string UserId { get; set; }
