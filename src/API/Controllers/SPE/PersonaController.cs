@@ -156,7 +156,10 @@ namespace API.Controllers.SPE
         [HttpGet("parents")]
         public async Task<ActionResult<ApiResponse<List<ParentResponse>>>> GetParentsAsync()
         {
-            var response = await _personaService.ParentListAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.ParentListAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -176,7 +179,10 @@ namespace API.Controllers.SPE
         [HttpGet("parent-students")]
         public async Task<ActionResult<ApiResponse<List<StudentResponse>>>> GetParentStudentsAsync(Guid parentId)
         {
-            var response = await _personaService.ParentStudentsListAsync(parentId);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.ParentStudentsListAsync(parentId, tenantId);
             return HandleResult(response);
         }
 
@@ -196,7 +202,10 @@ namespace API.Controllers.SPE
         [HttpGet("students")]
         public async Task<ActionResult<ApiResponse<List<StudentResponse>>>> GetStudentsAsync()
         {
-            var response = await _personaService.StudentListAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.StudentListAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -216,7 +225,10 @@ namespace API.Controllers.SPE
         [HttpGet("staff")]
         public async Task<ActionResult<ApiResponse<List<StaffResponse>>>> GetStaffAsync()
         {
-            var response = await _personaService.StaffListAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.StaffListAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -236,7 +248,10 @@ namespace API.Controllers.SPE
         [HttpGet("busDriver")]
         public async Task<ActionResult<ApiResponse<List<BusDriverResponse>>>> GetBusDriverAsync()
         {
-            var response = await _personaService.BusDriverListAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.BusDriverListAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -280,42 +295,42 @@ namespace API.Controllers.SPE
             return HandleResult(response);
         }
 
-        [SwaggerOperation(
-        Summary = "Edit Student Endpoint",
-        Description = "This endpoint edits a student. It requires Admin privilege",
-        OperationId = "student.edit",
-        Tags = new[] { "PersonaEndpoints" })
-        ]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpPut("edit-student")]
-        public async Task<ActionResult<ApiResponse<StudentResponse>>> EditStudentAsync(Guid studentId, [FromBody] EditStudentRequest request)
-        {
-            var response = await _personaService.EditStudentAsync(studentId, request, User.Identity!.Name ?? string.Empty);
-            return HandleResult(response);
-        }
+        // [SwaggerOperation(
+        // Summary = "Edit Student Endpoint",
+        // Description = "This endpoint edits a student. It requires Admin privilege",
+        // OperationId = "student.edit",
+        // Tags = new[] { "PersonaEndpoints" })
+        // ]
+        // [Produces(MediaTypeNames.Application.Json)]
+        // [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        // [HttpPut("edit-student")]
+        // public async Task<ActionResult<ApiResponse<StudentResponse>>> EditStudentAsync(Guid studentId, [FromBody] EditStudentRequest request)
+        // {
+        //     var response = await _personaService.EditStudentAsync(studentId, request, User.Identity!.Name ?? string.Empty);
+        //     return HandleResult(response);
+        // }
 
-        [SwaggerOperation(
-         Summary = "Edit Parent Endpoint",
-         Description = "This endpoint edits a parent. It requires Admin privilege",
-         OperationId = "parent.edit",
-         Tags = new[] { "PersonaEndpoints" })
-         ]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
-        [HttpPut("edit-parent")]
-        public async Task<ActionResult<BaseResponse>> EditParentAsync(Guid parentId, [FromBody] EditParentRequest request)
-        {
-            var response = await _personaService.EditParentAsync(parentId, request, User.Identity!.Name ?? string.Empty);
-            return HandleResult(response);
-        }
+        // [SwaggerOperation(
+        //  Summary = "Edit Parent Endpoint",
+        //  Description = "This endpoint edits a parent. It requires Admin privilege",
+        //  OperationId = "parent.edit",
+        //  Tags = new[] { "PersonaEndpoints" })
+        //  ]
+        // [Produces(MediaTypeNames.Application.Json)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        // [HttpPut("edit-parent")]
+        // public async Task<ActionResult<BaseResponse>> EditParentAsync(Guid parentId, [FromBody] EditParentRequest request)
+        // {
+        //     var response = await _personaService.EditParentAsync(parentId, request, User.Identity!.Name ?? string.Empty);
+        //     return HandleResult(response);
+        // }
 
         [SwaggerOperation(
         Summary = "Get A Parent Endpoint",
@@ -333,7 +348,10 @@ namespace API.Controllers.SPE
         [HttpGet("parentId")]
         public async Task<ActionResult<ApiResponse<ParentResponse>>> GetParentAsync(Guid parentId)
         {
-            var response = await _personaService.GetParentAsync(parentId);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.GetParentAsync(parentId, tenantId);
             return HandleResult(response);
         }
 
@@ -353,7 +371,10 @@ namespace API.Controllers.SPE
         [HttpGet("studentId")]
         public async Task<ActionResult<ApiResponse<StudentResponse>>> GetStudentAsync(Guid studentId)
         {
-            var response = await _personaService.GetStudentAsync(studentId);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.GetStudentAsync(studentId, tenantId);
             return HandleResult(response);
         }
 

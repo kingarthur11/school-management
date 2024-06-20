@@ -17,13 +17,12 @@ namespace Core.Services
             _jobTitleRepository = jobTitleRepository;
         }
 
-        public async Task<BaseResponse> CreateJobTitle(CreateJobTitleRequest request)
+        public async Task<BaseResponse> CreateJobTitle(CreateJobTitleRequest request, string tenantId)
         {
             var jobTitle = new JobTitle()
             {
                 Name = request.Name,
-                
-          
+                TenantId = tenantId,
             };
 
             var result = await _jobTitleRepository.AddJobTitle(jobTitle);
@@ -32,12 +31,12 @@ namespace Core.Services
 
         // Add additional methods as needed for job title-related operations
 
-        public async Task<ApiResponse<List<JobTitleRespone>>> GetAllAsync()
+        public async Task<ApiResponse<List<JobTitleRespone>>> GetAllAsync(string tenantId)
         {
             var jobTitle = await _jobTitleRepository.GetAllAsync();
             return new ApiResponse<List<JobTitleRespone>>()
             {
-                Data = await jobTitle.Select(x => new JobTitleRespone()
+                Data = await jobTitle.Where(p => p.TenantId == tenantId).Select(x => new JobTitleRespone()
                 {
                     Id = x.Id,
                     Name = x.Name,

@@ -6,8 +6,8 @@ namespace Core.Interfaces.Services
 {
     public interface ICampusService
     {
-        public Task<BaseResponse> CreateCampus(CreateCampusRequest request, string creator);
-        public Task<ApiResponse<List<CampusResponse>>> GetAllAsync();
-        public Task<ApiResponse<List<CampusResponse>>> GetCampusWithGradesAsync();
+        public Task<BaseResponse> CreateCampus(CreateCampusRequest request, string creator, string tenantId);
+        public Task<ApiResponse<List<CampusResponse>>> GetAllAsync(string tenantId);
+        public Task<ApiResponse<List<CampusResponse>>> GetCampusWithGradesAsync(string tenantId);
     }
 }

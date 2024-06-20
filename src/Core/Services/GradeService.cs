@@ -16,7 +16,7 @@ namespace Core.Services
             _gradeRepository = gradeRepository;
         }
 
-        public async Task<BaseResponse> CreateGrade(CreateGradeRequest request)
+        public async Task<BaseResponse> CreateGrade(CreateGradeRequest request, string tenantId)
         {
             var grade = new Grade()
             {
@@ -24,19 +24,20 @@ namespace Core.Services
                 Arms = request.Arms,
                 CampusId = request.CampusId,
                 Level = request.Level,
+                TenantId = tenantId,
             };
 
             var result = await _gradeRepository.AddGrade(grade);
             return result;
         }
 
-        public async Task<ApiResponse<List<GradeResponse>>> GetAllAsync()
+        public async Task<ApiResponse<List<GradeResponse>>> GetAllAsync(string tenantId)
         {
             var grades = await _gradeRepository.GetAllAsync();
 
             return new ApiResponse<List<GradeResponse>>()
             {
-                Data = await grades.Select(x => new GradeResponse()
+                Data = await grades.Where(p => p.TenantId == tenantId).Select(x => new GradeResponse()
                 {
                     Id = x.Id,
                     Name = x.Name,

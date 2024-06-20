@@ -38,6 +38,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Location = table.Column<string>(type: "text", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
@@ -58,6 +59,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedBy = table.Column<string>(type: "text", nullable: true),
@@ -77,6 +79,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedBy = table.Column<string>(type: "text", nullable: true),
@@ -205,6 +208,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "text", nullable: true),
                     BusDriver = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     FuelCousumption = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     IsReFuel = table.Column<bool>(type: "boolean", nullable: false),
@@ -288,6 +292,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Level = table.Column<string>(type: "text", nullable: false),
                     Arms = table.Column<int>(type: "integer", nullable: false),
@@ -661,6 +666,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "text", nullable: true),
                     UserEmail = table.Column<string>(type: "text", nullable: false),
                     StudentId = table.Column<Guid>(type: "uuid", nullable: true),
                     InSchool = table.Column<bool>(type: "boolean", nullable: false),

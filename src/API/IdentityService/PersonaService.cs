@@ -187,14 +187,14 @@ namespace Core.Services
             }
             else
             {
-                user = new User()
-                {
-                    UserName = string.Concat(request.FirstName, request.LastName),
+                user = new User() { 
+                    // Id = Guid.NewGuid() ,
+                    UserName = string.Concat(request.FirstName,  request.LastName),
                     Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"),
-                    PhoneNumber = parent.PhoneNumber,
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
-                    EmailConfirmed = true,
+                    PhoneNumber = parent.PhoneNumber, 
+                    FirstName = request.FirstName, 
+                    LastName = request.LastName, 
+                    EmailConfirmed = true, 
                     TenantId = tenantId,
                     PhotoUrl = photoUrl,
                     PesonaType = PersonaType.Student
@@ -455,11 +455,10 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<ParentResponse>>> ParentListAsync()
+        public async Task<ApiResponse<List<ParentResponse>>> ParentListAsync(string tenantId)
         {
             var response = new ApiResponse<List<ParentResponse>>();
-
-            var parents = await _dbContext.Parents
+            var parents = await _dbContext.Parents.Where(p => p.TenantId == tenantId)
                 .Select(x => new ParentResponse()
                 {
                     FirstName = x.FirstName,
@@ -481,11 +480,11 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<StudentResponse>>> StudentListAsync()
+        public async Task<ApiResponse<List<StudentResponse>>> StudentListAsync(string tenantId)
         {
             var response = new ApiResponse<List<StudentResponse>>();
 
-            var students = _dbContext.Students
+            var students = _dbContext.Students.Where(p => p.TenantId == tenantId)
                 .Select(x => new StudentResponse()
                 {
                     StudentId = x.Id,
@@ -499,7 +498,7 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<StudentResponse>>> ParentStudentsListAsync(Guid parentId)
+        public async Task<ApiResponse<List<StudentResponse>>> ParentStudentsListAsync(Guid parentId, string tenantId)
         {
             var response = new ApiResponse<List<StudentResponse>>();
 
@@ -523,94 +522,12 @@ namespace Core.Services
             return response;
         }
 
-
-        public async Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor)
-        {
-            var response = new BaseResponse();
-
-            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == parentId);
-            if (parent is null)
-            {
-                response.Code = ResponseCodes.Status404NotFound;
-                response.Status = false;
-                response.Message = "Parent not found";
-                return response;
-            }
-
-            parent.FirstName = request.FirstName ?? parent.FirstName;
-            parent.LastName = request.LastName ?? parent.LastName;
-            parent.Edit(editor);
-
-            if (!(await _dbContext.TrySaveChangesAsync()))
-            {
-                response.Code = ResponseCodes.Status500InternalServerError;
-                response.Status = false;
-                response.Message = "Unable to update parent";
-                return response;
-            }
-
-            var persona = await _userManager.FindByIdAsync(parent.PersonaId.ToString());
-            if (persona is null)
-            {
-                _logger.LogInformation("Parent account not found. Update not completed");
-            }
-            else
-            {
-                persona.FirstName = request.FirstName ?? persona.FirstName;
-                persona.LastName = request.LastName ?? persona.LastName;
-                await _userManager.UpdateAsync(persona);
-            }
-
-            return response;
-        }
-
-
-        public async Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor)
-        {
-            var response = new ApiResponse<StudentResponse>();
-
-            var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.Id == studentId);
-            if (student is null)
-            {
-                response.Code = ResponseCodes.Status404NotFound;
-                response.Status = false;
-                response.Message = "Student not found";
-                return response;
-            }
-
-            student.FirstName = request.FirstName ?? student.FirstName;
-            student.LastName = request.LastName ?? student.LastName;
-            student.Edit(editor);
-
-            if (!(await _dbContext.TrySaveChangesAsync()))
-            {
-                response.Code = ResponseCodes.Status500InternalServerError;
-                response.Status = false;
-                response.Message = "Unable to update student";
-                return response;
-            }
-
-            var persona = await _userManager.FindByIdAsync(student.PersonaId.ToString());
-            if (persona is null)
-            {
-                _logger.LogInformation("Student account not found. Update not completed");
-            }
-            else
-            {
-                persona.FirstName = request.FirstName ?? persona.FirstName;
-                persona.LastName = request.LastName ?? persona.LastName;
-                await _userManager.UpdateAsync(persona);
-            }
-
-            return response;
-        }
-
-
-        public async Task<ApiResponse<List<StaffResponse>>> StaffListAsync()
+        public async Task<ApiResponse<List<StaffResponse>>> StaffListAsync(string tenantId)
         {
             var response = new ApiResponse<List<StaffResponse>>();
 
             var staff = _dbContext.Staffs
+                .Where(p => p.TenantId == tenantId)
                 .Select(x => new StaffResponse()
                 {
                     StaffId = x.Id,
@@ -623,12 +540,12 @@ namespace Core.Services
             response.Data = await staff.ToListAsync();
             return response;
         }
-
-        public async Task<ApiResponse<List<BusDriverResponse>>> BusDriverListAsync()
+        public async Task<ApiResponse<List<BusDriverResponse>>> BusDriverListAsync(string tenantId)
         {
             var response = new ApiResponse<List<BusDriverResponse>>();
 
             var busdrivers = _dbContext.Busdrivers
+                .Where(p => p.TenantId == tenantId)
                 .Include(x => x.Bus)
                 .Select(x => new BusDriverResponse()
                 {
@@ -680,12 +597,12 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<ParentResponse>> GetParentAsync(Guid parentId)
+        public async Task<ApiResponse<ParentResponse>> GetParentAsync(Guid parentId, string tenantId)
         {
             _logger.LogInformation("Trying to get a parent with id: {0}", parentId);
             var response = new ApiResponse<ParentResponse>() { Code = ResponseCodes.Status200OK };
 
-            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == parentId);
+            var parent = await _dbContext.Parents.Where(p => p.TenantId == tenantId).FirstOrDefaultAsync(x => x.Id == parentId);
             if (parent is null)
             {
                 _logger.LogInformation("Parent with id: {0} not found", parentId);
@@ -749,12 +666,12 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<StudentResponse>> GetStudentAsync(Guid studentId)
+        public async Task<ApiResponse<StudentResponse>> GetStudentAsync(Guid studentId, string tenantId)
         {
             _logger.LogInformation("Trying to get a student with id: {0}", studentId);
             var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status200OK };
 
-            var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.Id == studentId);
+            var student = await _dbContext.Students.Where(p => p.TenantId == tenantId).FirstOrDefaultAsync(x => x.Id == studentId);
             if (student is null)
             {
                 _logger.LogInformation("Student with id: {0} not found", studentId);

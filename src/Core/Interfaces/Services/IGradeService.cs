@@ -6,8 +6,8 @@ namespace Core.Interfaces.Services
 {
     public interface IGradeService
     {
-        public Task<BaseResponse> CreateGrade(CreateGradeRequest request);
+        public Task<BaseResponse> CreateGrade(CreateGradeRequest request, string tenantId);
        
-        public Task<ApiResponse<List<GradeResponse>>> GetAllAsync();
+        public Task<ApiResponse<List<GradeResponse>>> GetAllAsync(string tenantId);
     }
 }

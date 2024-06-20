@@ -7,8 +7,8 @@ namespace Core.Interfaces.Services
 {
     public interface IDepartmentService
     {
-        public Task<BaseResponse> CreateDepartment(CreateDepartmentRequest request, string creator);
-        public Task<ApiResponse<List<DepartmentResponse>>> GetAllAsync();
+        public Task<BaseResponse> CreateDepartment(CreateDepartmentRequest request, string creator, string tenantId);
+        public Task<ApiResponse<List<DepartmentResponse>>> GetAllAsync(string tenantId);
         Task<BaseResponse> UpdateDepartmentAsync(UpdateDepartmentRequest request);
 
     }

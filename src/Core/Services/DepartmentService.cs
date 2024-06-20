@@ -17,7 +17,7 @@ namespace Core.Services
             _departmentRepository = departmentRepository;
         }
 
-        public async Task<BaseResponse> CreateDepartment(CreateDepartmentRequest request, string creator)
+        public async Task<BaseResponse> CreateDepartment(CreateDepartmentRequest request, string creator, string tenantId)
         {
             var department = new Department()
             {
@@ -25,18 +25,19 @@ namespace Core.Services
                 Name = request.DepartmentName,
                 CreatedBy = creator,
                 Created = DateTime.UtcNow,
+                TenantId = tenantId,
             };
 
             return await _departmentRepository.AddDepartment(department);
         }
 
-        public async Task<ApiResponse<List<DepartmentResponse>>> GetAllAsync()
+        public async Task<ApiResponse<List<DepartmentResponse>>> GetAllAsync(string tenantId)
         {
             var departments = await _departmentRepository.GetAllAsync();
 
             return new ApiResponse<List<DepartmentResponse>>()
             {
-                Data = await departments.Select(x => new DepartmentResponse()
+                Data = await departments.Where(p => p.TenantId == tenantId).Select(x => new DepartmentResponse()
                 {
                     Id = x.Id,
                     DeparmentName = x.Name

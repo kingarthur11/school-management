@@ -16,7 +16,7 @@ namespace Core.Services
             _busRepository = busRepository;
         }
 
-        public async Task<BaseResponse> CreatBus(CreateBusRequest request, string creator)
+        public async Task<BaseResponse> CreatBus(CreateBusRequest request, string creator, string tenantId)
         {
             var bus = new Bus()
             {
@@ -24,19 +24,20 @@ namespace Core.Services
                 NumberOfSeat = request.NumberOfSeat,
                 CreatedBy = creator,
                 Created = DateTime.UtcNow,
+                TenantId = tenantId,
             };
 
             var result = await _busRepository.AddBus(bus);
             return result;
         }
 
-        public async Task<ApiResponse<List<BusResponse>>> GetAllAsync()
+        public async Task<ApiResponse<List<BusResponse>>> GetAllAsync(string tenantId)
         {
             var buses = await _busRepository.GetAllAsync();
 
             return new ApiResponse<List<BusResponse>>()
             {
-                Data = await buses.Select(x => new BusResponse()
+                Data = await buses.Where(p => p.TenantId == tenantId).Select(x => new BusResponse()
                 {
                     Id = x.Id,
                     NumberOfSeat = x.NumberOfSeat,
