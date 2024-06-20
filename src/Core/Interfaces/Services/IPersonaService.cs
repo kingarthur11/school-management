@@ -9,7 +9,7 @@ namespace Core.Interfaces.Services
     {
         public Task<ApiResponse<ParentResponse>> CreateParentAsync(CreateParentRequest request, string host, string tenantId, string email);
         public Task<ApiResponse<List<ParentResponse>>> ParentListAsync(string tenantId);
-        public Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor);
+        // public Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor);
         public Task<ApiResponse<ParentResponse>> GetParentAsync(Guid parentId, string tenantId);
         public Task<BaseResponse> DeleteParentAsync(Guid parentId, string deletor);
         public Task<ApiResponse<StudentResponse>> CreateStudentAsync(CreateStudentRequest request, string host, string tenantId, string email);
@@ -22,7 +22,7 @@ namespace Core.Interfaces.Services
         public Task<ApiResponse<List<StaffResponse>>> StaffListAsync(string tenantId);
         public Task<ApiResponse<List<BusDriverResponse>>> BusDriverListAsync(string tenantId);
 
-        public Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor);
+        // public Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor);
         public Task<BaseResponse> DeletePersonaAccountAsync(string email);
         public Task<BaseResponse> UpdateParentInfoAsync(Guid parentId, UpdateParentInfoRequest request, string editor);
     }
