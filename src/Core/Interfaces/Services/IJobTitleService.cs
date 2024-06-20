@@ -6,8 +6,8 @@ namespace Core.Interfaces.Services
 {
     public interface IJobTitleService
     {
-        public Task<BaseResponse> CreateJobTitle(CreateJobTitleRequest request);
-        public Task<ApiResponse<List<JobTitleRespone>>> GetAllAsync();
+        public Task<BaseResponse> CreateJobTitle(CreateJobTitleRequest request, string tenantId);
+        public Task<ApiResponse<List<JobTitleRespone>>> GetAllAsync(string tenantId);
 
 
     }

@@ -16,7 +16,7 @@ namespace Core.Services
             _campusRepository = campusRepository;
         }
 
-        public async Task<BaseResponse> CreateCampus(CreateCampusRequest request, string creator)
+        public async Task<BaseResponse> CreateCampus(CreateCampusRequest request, string creator, string tenantId)
         {
             var campus = new Campus()
             {
@@ -24,19 +24,20 @@ namespace Core.Services
                 Location = request.Location,
                 CreatedBy = creator,
                 Created = DateTime.UtcNow,
+                TenantId = tenantId,
             };
 
             var result = await _campusRepository.AddCampus(campus);
             return result;
         }
 
-        public async Task<ApiResponse<List<CampusResponse>>> GetAllAsync()
+        public async Task<ApiResponse<List<CampusResponse>>> GetAllAsync(string tenantId)
         {
             var campuses = await _campusRepository.GetAllAsync();
 
             return new ApiResponse<List<CampusResponse>>()
             {
-                Data = await campuses.Select(x => new CampusResponse()
+                Data = await campuses.Where(p => p.TenantId == tenantId).Select(x => new CampusResponse()
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -45,13 +46,13 @@ namespace Core.Services
             };
         }
         
-        public async Task<ApiResponse<List<CampusResponse>>> GetCampusWithGradesAsync()
+        public async Task<ApiResponse<List<CampusResponse>>> GetCampusWithGradesAsync(string tenantId)
         {
             var campuses = await _campusRepository.GetCampusWithGradesAsync();
 
             return new ApiResponse<List<CampusResponse>>()
             {
-                Data = await campuses.Select(c => new CampusResponse()
+                Data = await campuses.Where(p => p.TenantId == tenantId).Select(c => new CampusResponse()
                 {
                     Id = c.Id,
                     Name = c.Name,

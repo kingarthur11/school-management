@@ -13,6 +13,7 @@ using Shared.Models.Requests;
 using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
+using System.Security.Claims;
 
 namespace API.Controllers.SPE
 {
@@ -49,9 +50,12 @@ namespace API.Controllers.SPE
         [HttpPost("generate-qrcode")]
         public async Task<ActionResult<ApiResponse<GenerateQrCodeResponse>>> GenerateQrCodeAsync(GenerateQrCodeRequest request)
         {
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
             request.UserEmail = User.Identity!.Name ?? string.Empty;
 
-            var response = await _qrCodeService.CreateQrCodeAsync(request);
+            var response = await _qrCodeService.CreateQrCodeAsync(request, tenantId);
             return HandleResult(response);
         }
 
@@ -95,7 +99,10 @@ namespace API.Controllers.SPE
         [HttpPut("scan-qrcode-student")]
         public async Task<ActionResult<ApiResponse<ScanQrCodeResponse>>> ScanQrCodeForStudentAsync(string qrCodeData)
         {
-            var response = await _qrCodeService.ScanQrCodeForStudentAsync(qrCodeData, User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _qrCodeService.ScanQrCodeForStudentAsync(qrCodeData, User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 
@@ -116,7 +123,10 @@ namespace API.Controllers.SPE
         [HttpPut("scan-qrcode-busdriver")]
         public async Task<ActionResult<ApiResponse<ScanQrCodeBusDriverResponse>>> ScanQrCodeForDriverAsync(string qrCodeData)
         {
-            var response = await _qrCodeService.ScanQrCodeForBusDriverAsync(qrCodeData, User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _qrCodeService.ScanQrCodeForBusDriverAsync(qrCodeData, User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 
@@ -138,7 +148,10 @@ namespace API.Controllers.SPE
         [HttpGet("students")]
         public async Task<ActionResult<ApiResponse<List<StudentWithQrCodeResponse>>>> GetParentStudentsAsync()
         {
-            var response = await _qrCodeService.GetParentStudentsAsync(User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _qrCodeService.GetParentStudentsAsync(User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 
@@ -160,7 +173,10 @@ namespace API.Controllers.SPE
         [HttpPost("create-trip")]
         public async Task<ActionResult<ApiResponse<Guid?>>> CreateTripAsync(CreateTripRequest request)
         {
-            var response = await _tripService.CreateTripAsync(request, User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _tripService.CreateTripAsync(request, User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 
@@ -183,7 +199,10 @@ namespace API.Controllers.SPE
         [HttpGet("trip-list")]
         public async Task<ActionResult<ApiResponse<List<TripResponse>>>> TripListAsync()
         {
-            var response = await _tripService.TripListAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _tripService.TripListAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -203,7 +222,10 @@ namespace API.Controllers.SPE
         [HttpPost("trip/add-student")]
         public async Task<ActionResult<BaseResponse>> AddStudentToTrip([FromBody] AddStudentToTripRequest request)
         {
-            var response = await _tripService.AddStudentToTripAsync(request);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _tripService.AddStudentToTripAsync(request, tenantId);
             return HandleResult(response);
         }
 
@@ -243,7 +265,10 @@ namespace API.Controllers.SPE
         [HttpGet("trip/not-onboarded/{tripId}")]
         public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponse>>>> GetNotOnboardedStudentsAsync(Guid tripId)
         {
-            var response = await _tripService.GetNotOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _tripService.GetNotOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 
@@ -263,7 +288,10 @@ namespace API.Controllers.SPE
         [HttpGet("trip/onboarded/{tripId}")]
         public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponse>>>> GetOnboardedStudentsAsync(Guid tripId)
         {
-            var response = await _tripService.GetOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _tripService.GetOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 
@@ -306,7 +334,10 @@ namespace API.Controllers.SPE
         [HttpPost("trip/generate-qrCode/{tripId}/")]
         public async Task<ActionResult<ApiResponse<GenerateQrCodeResponse>>> GenerateQrCodeForTrip([FromRoute] Guid tripId)
         {
-            var response = await _qrCodeService.GenerateQrCodeForTripAsync(tripId, User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _qrCodeService.GenerateQrCodeForTripAsync(tripId, User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
     }

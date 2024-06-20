@@ -30,7 +30,7 @@ namespace Core.Services
             _logger = logger;
         }
 
-        public async Task<ApiResponse<Guid?>> CreateTripAsync(CreateTripRequest request, string driver)
+        public async Task<ApiResponse<Guid?>> CreateTripAsync(CreateTripRequest request, string driver, string tenantId)
         {
             var response = new ApiResponse<Guid?>();
 
@@ -43,6 +43,7 @@ namespace Core.Services
                 ReasonForReFuel = request.ReasonForRefuel,
                 RouteFollowed = request.RouteFollowed,
                 TripType = request.TripType,
+                TenantId = tenantId,
             };
 
             var result = await _tripRepository.AddAsync(trip);
@@ -58,7 +59,7 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<TripResponse>>> TripListAsync()
+        public async Task<ApiResponse<List<TripResponse>>> TripListAsync(string tenantId)
         {
             var trips =  _tripRepository.GetAllAsync();
 
@@ -75,7 +76,7 @@ namespace Core.Services
             };
         }
 
-        public async Task<BaseResponse> AddStudentToTripAsync(AddStudentToTripRequest request)
+        public async Task<BaseResponse> AddStudentToTripAsync(AddStudentToTripRequest request, string tenantId)
         {
             var tripStudent = new TripStudent
             {
@@ -88,7 +89,7 @@ namespace Core.Services
             return await _tripRepository.AddStudentToTripAsync(tripStudent);
         }
 
-        public async Task<ApiResponse<IEnumerable<StudentResponse>>> GetNotOnboardedStudentAsync(Guid tripId, string busDriverEmail)
+        public async Task<ApiResponse<IEnumerable<StudentResponse>>> GetNotOnboardedStudentAsync(Guid tripId, string busDriverEmail, string tenantId)
         {
             var busDriver = await _busDriverRepository.GetBusdriverByEmail(busDriverEmail);
             if (busDriver is null)
@@ -122,7 +123,7 @@ namespace Core.Services
 
         }
 
-        public async Task<ApiResponse<IEnumerable<StudentResponse>>> GetOnboardedStudentAsync(Guid tripId, string busDriverEmail)
+        public async Task<ApiResponse<IEnumerable<StudentResponse>>> GetOnboardedStudentAsync(Guid tripId, string busDriverEmail, string tenantId)
         {
             var busDriver = await _busDriverRepository.GetBusdriverByEmail(busDriverEmail);
             if (busDriver is null)

@@ -165,7 +165,10 @@ namespace API.Controllers.SPE
         [HttpGet("parents")]
         public async Task<ActionResult<ApiResponse<List<ParentResponse>>>> GetParentsAsync()
         {
-            var response = await _personaService.ParentListAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.ParentListAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -186,7 +189,10 @@ namespace API.Controllers.SPE
         [HttpGet("parent-students")]
         public async Task<ActionResult<ApiResponse<List<StudentResponse>>>> GetParentStudentsAsync(Guid parentId)
         {
-            var response = await _personaService.ParentStudentsListAsync(parentId);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.ParentStudentsListAsync(parentId, tenantId);
             return HandleResult(response);
         }
 
@@ -207,7 +213,10 @@ namespace API.Controllers.SPE
         [HttpGet("students")]
         public async Task<ActionResult<ApiResponse<List<StudentResponse>>>> GetStudentsAsync()
         {
-            var response = await _personaService.StudentListAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.StudentListAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -228,7 +237,10 @@ namespace API.Controllers.SPE
         [HttpGet("staff")]
         public async Task<ActionResult<ApiResponse<List<StaffResponse>>>> GetStaffAsync()
         {
-            var response = await _personaService.StaffListAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.StaffListAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -250,7 +262,10 @@ namespace API.Controllers.SPE
         [HttpGet("busDriver")]
         public async Task<ActionResult<ApiResponse<List<BusDriverResponse>>>> GetBusDriverAsync()
         {
-            var response = await _personaService.BusDriverListAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.BusDriverListAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -371,7 +386,10 @@ namespace API.Controllers.SPE
         [HttpGet("parentId")]
         public async Task<ActionResult<ApiResponse<ParentResponse>>> GetParentAsync(Guid parentId)
         {
-            var response = await _personaService.GetParentAsync(parentId);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.GetParentAsync(parentId, tenantId);
             return HandleResult(response);
         }
 
@@ -392,7 +410,10 @@ namespace API.Controllers.SPE
         [HttpGet("studentId")]
         public async Task<ActionResult<ApiResponse<StudentResponse>>> GetStudentAsync(Guid studentId)
         {
-            var response = await _personaService.GetStudentAsync(studentId);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _personaService.GetStudentAsync(studentId, tenantId);
             return HandleResult(response);
         }
 

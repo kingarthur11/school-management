@@ -46,7 +46,10 @@ namespace API.Controllers.SPE
         [HttpGet("parent-mobile")]
         public async Task<ActionResult<ApiResponse<List<StudentInSchoolResponse>>>> GetParentStudentsAsync()
         {
-            var response = await _qrCodeService.GetTodaysQrCodeAsync(User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _qrCodeService.GetTodaysQrCodeAsync(User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 

@@ -49,7 +49,10 @@ namespace API.Controllers.SPE
         [HttpPost("create-campus")]
         public async Task<ActionResult<BaseResponse>> CreateCampusAsync(CreateCampusRequest request)
         {
-            var response = await _campusService.CreateCampus(request, User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _campusService.CreateCampus(request, User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 
@@ -71,7 +74,10 @@ namespace API.Controllers.SPE
         [HttpGet("campus-list")]
         public async Task<ActionResult<ApiResponse<List<CampusResponse>>>> GetCampusListAsync()
         {
-            var response = await _campusService.GetAllAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _campusService.GetAllAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -93,7 +99,10 @@ namespace API.Controllers.SPE
         [HttpGet("campus-grades-list")]
         public async Task<ActionResult<ApiResponse<List<CampusResponse>>>> GetCampusWithGradesAsync()
         {
-            var response = await _campusService.GetCampusWithGradesAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _campusService.GetCampusWithGradesAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -116,7 +125,10 @@ namespace API.Controllers.SPE
         [HttpPost("create-grade")]
         public async Task<ActionResult<BaseResponse>> CreateGradeAsync(CreateGradeRequest request)
         {
-            var response = await _gradeService.CreateGrade(request);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+
+            var response = await _gradeService.CreateGrade(request, tenantId);
             return HandleResult(response);
         }
 
@@ -138,7 +150,10 @@ namespace API.Controllers.SPE
         [HttpGet("grade-list")]
         public async Task<ActionResult<ApiResponse<List<GradeResponse>>>> GetGradesAsync()
         {
-            var response = await _gradeService.GetAllAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _gradeService.GetAllAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -161,7 +176,10 @@ namespace API.Controllers.SPE
         [HttpPost("create-jobTitle")]
         public async Task<ActionResult<BaseResponse>> CreateJobTitleAsync(CreateJobTitleRequest request)
         {
-            var response = await _jobTitleService.CreateJobTitle(request);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _jobTitleService.CreateJobTitle(request, tenantId);
             return HandleResult(response);
         }
 
@@ -183,7 +201,10 @@ namespace API.Controllers.SPE
         [HttpGet("jobTitle-list")]
         public async Task<ActionResult<ApiResponse<List<JobTitleRespone>>>> GetJobTitleAsync()
         {
-            var response = await _jobTitleService.GetAllAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _jobTitleService.GetAllAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -205,7 +226,10 @@ namespace API.Controllers.SPE
         [HttpPost("create-bus")]
         public async Task<ActionResult<BaseResponse>> CreateBusAsync(CreateBusRequest request)
         {
-            var response = await _busService.CreatBus(request, User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _busService.CreatBus(request, User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 
@@ -227,7 +251,10 @@ namespace API.Controllers.SPE
         [HttpGet("bus-list")]
         public async Task<ActionResult<ApiResponse<List<BusResponse>>>> GetBusesAsync()
         {
-            var response = await _busService.GetAllAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _busService.GetAllAsync(tenantId);
             return HandleResult(response);
         }
 
@@ -248,7 +275,10 @@ namespace API.Controllers.SPE
         [HttpPost("create-department")]
         public async Task<ActionResult<BaseResponse>> CreateDepartmentAsync(CreateDepartmentRequest request)
         {
-            var response = await _departmentService.CreateDepartment(request, User.Identity!.Name ?? string.Empty);
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _departmentService.CreateDepartment(request, User.Identity!.Name ?? string.Empty, tenantId);
             return HandleResult(response);
         }
 
@@ -270,7 +300,10 @@ namespace API.Controllers.SPE
         [HttpGet("department-list")]
         public async Task<ActionResult<ApiResponse<List<DepartmentResponse>>>> GetDepartmentsAsync()
         {
-            var response = await _departmentService.GetAllAsync();
+            var tenantIdClaim = HttpContext.User.FindFirst("TenantId");
+            var tenantId = tenantIdClaim.Value;
+            
+            var response = await _departmentService.GetAllAsync(tenantId);
             return HandleResult(response);
         }
 

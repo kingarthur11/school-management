@@ -248,7 +248,7 @@ namespace Core.Services
                 user = new User() { 
                     // Id = Guid.NewGuid() ,
                     UserName = string.Concat(request.FirstName,  request.LastName),
-                     Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"),
+                    Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"),
                     PhoneNumber = parent.PhoneNumber, 
                     FirstName = request.FirstName, 
                     LastName = request.LastName, 
@@ -605,11 +605,10 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<ParentResponse>>> ParentListAsync()
+        public async Task<ApiResponse<List<ParentResponse>>> ParentListAsync(string tenantId)
         {
             var response = new ApiResponse<List<ParentResponse>>();
-
-            var parents = await _dbContext.Parents
+            var parents = await _dbContext.Parents.Where(p => p.TenantId == tenantId)
                 .Select(x => new ParentResponse()
                 {
                     FirstName = x.FirstName,
@@ -632,11 +631,11 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<StudentResponse>>> StudentListAsync()
+        public async Task<ApiResponse<List<StudentResponse>>> StudentListAsync(string tenantId)
         {
             var response = new ApiResponse<List<StudentResponse>>();
 
-            var students = _dbContext.Students
+            var students = _dbContext.Students.Where(p => p.TenantId == tenantId)
                 .Select(x => new StudentResponse()
                 {
                     StudentId = x.Id,
@@ -650,7 +649,7 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<StudentResponse>>> ParentStudentsListAsync(Guid parentId)
+        public async Task<ApiResponse<List<StudentResponse>>> ParentStudentsListAsync(Guid parentId, string tenantId)
         {
             var response = new ApiResponse<List<StudentResponse>>();
 
@@ -674,11 +673,12 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<StaffResponse>>> StaffListAsync()
+        public async Task<ApiResponse<List<StaffResponse>>> StaffListAsync(string tenantId)
         {
             var response = new ApiResponse<List<StaffResponse>>();
 
             var staff = _dbContext.Staffs
+                .Where(p => p.TenantId == tenantId)
                 .Select(x => new StaffResponse()
                 {
                     StaffId = x.Id,
@@ -691,11 +691,12 @@ namespace Core.Services
             response.Data = await staff.ToListAsync();
             return response;
         }
-        public async Task<ApiResponse<List<BusDriverResponse>>> BusDriverListAsync()
+        public async Task<ApiResponse<List<BusDriverResponse>>> BusDriverListAsync(string tenantId)
         {
             var response = new ApiResponse<List<BusDriverResponse>>();
 
             var busdrivers = _dbContext.Busdrivers
+                .Where(p => p.TenantId == tenantId)
                 .Include(x => x.Bus)
                 .Select(x => new BusDriverResponse()
                 {
@@ -747,12 +748,12 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<ParentResponse>> GetParentAsync(Guid parentId)
+        public async Task<ApiResponse<ParentResponse>> GetParentAsync(Guid parentId, string tenantId)
         {
             _logger.LogInformation("Trying to get a parent with id: {0}", parentId);
             var response = new ApiResponse<ParentResponse>() { Code = ResponseCodes.Status200OK };
 
-            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == parentId);
+            var parent = await _dbContext.Parents.Where(p => p.TenantId == tenantId).FirstOrDefaultAsync(x => x.Id == parentId);
             if (parent is null)
             {
                 _logger.LogInformation("Parent with id: {0} not found", parentId);
@@ -817,12 +818,12 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<StudentResponse>> GetStudentAsync(Guid studentId)
+        public async Task<ApiResponse<StudentResponse>> GetStudentAsync(Guid studentId, string tenantId)
         {
             _logger.LogInformation("Trying to get a student with id: {0}", studentId);
             var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status200OK };
 
-            var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.Id == studentId);
+            var student = await _dbContext.Students.Where(p => p.TenantId == tenantId).FirstOrDefaultAsync(x => x.Id == studentId);
             if (student is null)
             {
                 _logger.LogInformation("Student with id: {0} not found", studentId);

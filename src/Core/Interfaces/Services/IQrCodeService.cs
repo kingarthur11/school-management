@@ -11,14 +11,14 @@ namespace Core.Interfaces.Services
 {
     public interface IQrCodeService
     {
-        public Task<ApiResponse<List<StudentInSchoolResponse>>> GetTodaysQrCodeAsync(string email);
-        public Task<ApiResponse<GenerateQrCodeResponse>> CreateQrCodeAsync(GenerateQrCodeRequest request);
+        public Task<ApiResponse<List<StudentInSchoolResponse>>> GetTodaysQrCodeAsync(string email, string tenantId);
+        public Task<ApiResponse<GenerateQrCodeResponse>> CreateQrCodeAsync(GenerateQrCodeRequest request, string tenantId);
         public Task<BaseResponse> AuthorizeQrCode(AuthorizeQrCodeRequest request);
-        public Task<ApiResponse<List<StudentWithQrCodeResponse>>> GetParentStudentsAsync(string email);
-        public Task<ApiResponse<List<GenerateQrCodeResponse>>> GenerateQrCodesForTripAsync(Guid tripId, string busDriverEmail);
-        public Task<ApiResponse<GenerateQrCodeResponse>> GenerateQrCodeForTripAsync(Guid tripId, string busDriverEmail);
+        public Task<ApiResponse<List<StudentWithQrCodeResponse>>> GetParentStudentsAsync(string email, string tenantId);
+        public Task<ApiResponse<List<GenerateQrCodeResponse>>> GenerateQrCodesForTripAsync(Guid tripId, string busDriverEmail, string tenantId);
+        public Task<ApiResponse<GenerateQrCodeResponse>> GenerateQrCodeForTripAsync(Guid tripId, string busDriverEmail, string tenantId);
 
-        public Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeForStudentAsync(string qrCodeData, string user);
-        public Task<ApiResponse<ScanQrCodeBusDriverResponse>> ScanQrCodeForBusDriverAsync(string qrCodeData, string user);
+        public Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeForStudentAsync(string qrCodeData, string user, string tenantId);
+        public Task<ApiResponse<ScanQrCodeBusDriverResponse>> ScanQrCodeForBusDriverAsync(string qrCodeData, string user, string tenantId);
     }
 }

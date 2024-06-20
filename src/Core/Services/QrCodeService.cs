@@ -34,7 +34,7 @@ namespace Core.Services
             _busDriverRepository = busDriverRepository;
         }
 
-        public async Task<ApiResponse<List<StudentInSchoolResponse>>> GetTodaysQrCodeAsync(string email)
+        public async Task<ApiResponse<List<StudentInSchoolResponse>>> GetTodaysQrCodeAsync(string email, string tenantId)
         {
             var data = await _qrCodeRepository.GetTodaysQrCodeAsync(email);
 
@@ -44,7 +44,7 @@ namespace Core.Services
             };
         }
 
-        public async Task<ApiResponse<List<StudentWithQrCodeResponse>>> GetParentStudentsAsync(string email)
+        public async Task<ApiResponse<List<StudentWithQrCodeResponse>>> GetParentStudentsAsync(string email, string tenantId)
         {
             var data = await _qrCodeRepository.GetParentStudentsAsync(email);
 
@@ -54,7 +54,7 @@ namespace Core.Services
             };
         }
 
-        public async Task<ApiResponse<GenerateQrCodeResponse>> CreateQrCodeAsync(GenerateQrCodeRequest request)
+        public async Task<ApiResponse<GenerateQrCodeResponse>> CreateQrCodeAsync(GenerateQrCodeRequest request, string tenantId)
         {
             var response = new ApiResponse<GenerateQrCodeResponse>();
 
@@ -127,14 +127,14 @@ namespace Core.Services
         }
 
 
-        public async Task<ApiResponse<List<GenerateQrCodeResponse>>> GenerateQrCodesForTripAsync(Guid tripId, string busDriverEmail)
+        public async Task<ApiResponse<List<GenerateQrCodeResponse>>> GenerateQrCodesForTripAsync(Guid tripId, string busDriverEmail, string tenantId)
         {
             //TOdo: check if busDriver has already generate qrcode for the day before proceding
             var response = new ApiResponse<List<GenerateQrCodeResponse>>();
 
             List<GenerateQrCodeResponse> qrCodesResponse = new();
 
-            List<StudentResponse> onboardedStudents = (await _tripService.GetOnboardedStudentAsync(tripId, busDriverEmail)).Data.ToList();
+            List<StudentResponse> onboardedStudents = (await _tripService.GetOnboardedStudentAsync(tripId, busDriverEmail, tenantId)).Data.ToList();
 
             List<QrCode> newQrCodes = new();
 
@@ -204,7 +204,7 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<ApiResponse<GenerateQrCodeResponse>> GenerateQrCodeForTripAsync(Guid tripId, string busDriverEmail)
+        public async Task<ApiResponse<GenerateQrCodeResponse>> GenerateQrCodeForTripAsync(Guid tripId, string busDriverEmail, string tenantId)
         {
             ApiResponse<GenerateQrCodeResponse> response = new ();
             GenerateQrCodeResponse qrCodesResponse = new();
@@ -266,7 +266,7 @@ namespace Core.Services
 
         //public async Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeAsync(string qrCodeData, string user)
         //public async Task<object> ScanQrCodeAsync(string qrCodeData, string user)
-        public async Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeForStudentAsync(string qrCodeData, string user)
+        public async Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeForStudentAsync(string qrCodeData, string user, string tenantId)
         {
             var response = new ApiResponse<ScanQrCodeResponse>();
 
@@ -379,7 +379,7 @@ namespace Core.Services
         }
 
 
-        public async Task<ApiResponse<ScanQrCodeBusDriverResponse>> ScanQrCodeForBusDriverAsync(string qrCodeData, string user)
+        public async Task<ApiResponse<ScanQrCodeBusDriverResponse>> ScanQrCodeForBusDriverAsync(string qrCodeData, string user, string tenantId)
         {
             var response = new ApiResponse<ScanQrCodeBusDriverResponse>();
 
