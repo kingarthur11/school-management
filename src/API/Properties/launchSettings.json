@@ -43,7 +43,8 @@
         "SMS_ADMIN_EMAIL": "it@smsabuja.com",
         "SMS_ADMIN_PHONENUMBER": "08060216275",
         "SMS_ADMIN_PASSWORD": "DefaultPass@1234",
-        "JWT_SECRET_KEY": "SampleKey&392929SampleKey&392929SampleKey&392929"
+        "JWT_SECRET_KEY": "SampleKey&392929SampleKey&392929SampleKey&392929",
+        "PaystackSK": "sk_test_r3m3mb3r2pu70nasm1l3"
       },
       "dotnetRunMessages": true
     },
@@ -65,7 +66,8 @@
         "Key": "NvKYFvdIaiByWMpqtUnC94L3GvX6bm3BZvtfFHnNsWmz0zzm6FWZXIuFcmYvXOhgAReSe5mm3gyVr0c2hxWH9890PBXkhnqrqjwU",
         "Issuer": "JWTAuthenticationServer",
         "Audience": "JWTServicePostmanClient",
-        "Subject": "JWTServiceAccessToken"
+        "Subject": "JWTServiceAccessToken",
+        "PaystackSK": "sk_test_r3m3mb3r2pu70nasm1l3"
       },
       "dotnetRunMessages": true
     },
