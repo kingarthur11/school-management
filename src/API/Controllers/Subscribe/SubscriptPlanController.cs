@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Controllers;
+using Shared.Enums;
 using Shared.Models.Requests;
 using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
@@ -42,6 +43,20 @@ namespace API.Controllers.Subscribe
             return HandleResult(response);
         }
 
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<SubscribePlanResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("platform/{platform}")]
+        public async Task<ActionResult<ApiResponse<List<SubscribePlanResponse>>>> IndexByPlatform(AdminType platform)
+        {
+            var response = await _subscriptPlanRepo.GetAllSubscriptPlansByPlatformAsync(platform);
+            return HandleResult(response);
+        }
+
         // [SwaggerOperation(
         //       Summary = "Create a new Parent Endpoint",
         //       Description = "This endpoint creates a new Parent. It requires Admin privilege",
@@ -55,7 +70,7 @@ namespace API.Controllers.Subscribe
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpGet("{id}")]
+        [HttpGet("subPlanId/{id}")]
         public async Task<ActionResult<ApiResponse<SubscribePlanResponse>>> Show(Guid id)
         {
             var response = await _subscriptPlanRepo.ShowSubscriptPlanAsync(id);
@@ -80,7 +95,7 @@ namespace API.Controllers.Subscribe
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<BaseResponse>> CreateSubscriptPlanAsync([FromBody] CreateSubPlan request)
         {
             var response = await _subscriptPlanRepo.AddSubscriptPlan(request);
